@@ -56,6 +56,10 @@ If a Revit version is not installed, explain that the corresponding build could 
 - `.agents/skills` is the canonical source for repository-local agent skills.
 - `.agents/workflows` contains shared feature lifecycle, branch isolation, handoff, and validation workflows.
 - Keep `AGENTS.md` concise; place detailed agent procedures in `.agents` instead of duplicating them here.
+- Start feature planning from `.agents/workflows/feature-lifecycle.md`.
+- Use `.agents/workflows/branch-isolation.md` before parallel agent work.
+- Use `docs/ai/ai-tooling-setup.md` for Codex, Claude Code, Cursor, and Copilot setup.
+- Use `docs/security/mcp-security-policy.md` before adding or changing MCP tools.
 
 ## Done means
 

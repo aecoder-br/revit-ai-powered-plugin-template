@@ -56,13 +56,87 @@ Use the solution for navigation, editing, tests, and shared project builds. For 
 
 If a Revit version is not installed, the build script skips that version and reports the missing install folder.
 
-## Using as Visual Studio template
+## AI-powered development workflow
 
-The recommended creation path today is the `dotnet new` template, followed by opening the generated solution in Visual Studio:
+Use `AGENTS.md` as the repository-wide safety contract. Use `.agents/skills` as the canonical skill layer and `.agents/workflows` for feature lifecycle, branch isolation, handoffs, and validation.
+
+Recommended flow:
+
+1. Plan the feature with `.agents/workflows/feature-lifecycle.md`.
+2. Assign skills from `.agents/roster.json`.
+3. Isolate parallel work with `.agents/workflows/branch-isolation.md`.
+4. Validate with `./scripts/validate-skills.ps1 -IncludeMirrors` and `./scripts/check.ps1`.
+
+See `docs/ai/index.md` for the full AI tooling guide.
+
+## Choosing AI tools
+
+Choose the smallest tool set that your team will actually use:
+
+| Choice | Use when |
+| --- | --- |
+| `none` | You only want the Revit template and docs. |
+| `codex` | You use Codex with repo-local `.agents/skills` and `.codex/config.toml`. |
+| `claude` | You use Claude Code subagents and `.claude/skills` mirrors. |
+| `cursor` | You use Cursor agents, rules, and `.cursor/skills` mirrors. |
+| `copilot` | You use GitHub Copilot prompts under `.github/prompts`. |
+| `multi` | You want all supported adapters available. |
+
+Refresh Claude/Cursor skill mirrors with:
+
+```powershell
+./scripts/setup-ai-tools.ps1 -Tools All -Mode Copy -Validate
+```
+
+## Using Codex
+
+Codex should read `AGENTS.md`, `.agents/skills`, `.agents/workflows`, and `.codex/config.toml`.
+
+Use repository skills for planning, Revit API review, MCP design, QA, and PR review. Keep permissions restricted and require confirmation before destructive commands, worktree deletion, model writes, or external setup.
+
+## Using Claude Code
+
+Claude Code should use `CLAUDE.md`, `AGENTS.md`, `.claude/agents`, and `.claude/skills`.
+
+Regenerate Claude skill mirrors from the canonical `.agents/skills` layer:
+
+```powershell
+./scripts/setup-ai-tools.ps1 -Tools Claude -Mode Copy -Validate
+```
+
+Use worktrees and path ownership before running parallel agents.
+
+## Using Cursor
+
+Cursor should use `.cursor/rules`, `.cursor/agents`, and `.cursor/skills`.
+
+Regenerate Cursor skill mirrors from the canonical `.agents/skills` layer:
+
+```powershell
+./scripts/setup-ai-tools.ps1 -Tools Cursor -Mode Copy -Validate
+```
+
+Use `.cursor/rules/agent-team.mdc` for agent routing and `.agents/workflows` for coordination.
+
+## Using GitHub Copilot
+
+GitHub Copilot should use `.github/copilot-instructions.md` and prompt files in `.github/prompts`.
+
+Available prompts include feature planning, Revit API review, security review, QA validation, and PR summary. Prompts point back to `AGENTS.md` and `.agents/workflows` instead of duplicating long rules.
+
+## Creating a new plugin from the template
+
+Use the `dotnet new` template first:
 
 ```powershell
 ./scripts/pack-dotnet-template.ps1 -Force -Install
 dotnet new revit-ai-plugin -n MyRevitPlugin --AiTools multi
+```
+
+Then open the generated `.sln` in Visual Studio and run the relevant setup:
+
+```powershell
+./scripts/setup-ai-tools.ps1 -Tools All -Mode Copy -Validate
 ```
 
 The native Visual Studio template base is documented in `docs/ai/visual-studio-template.md` and staged from `templates/visualstudio`.
