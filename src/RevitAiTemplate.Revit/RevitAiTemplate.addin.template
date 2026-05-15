@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>Revit AI Template</Name>
+    <Assembly>{{ASSEMBLY_PATH}}</Assembly>
+    <AddInId>45FDAE02-D084-47AF-9C5E-0398B80B6BD1</AddInId>
+    <FullClassName>RevitAiTemplate.Revit.App</FullClassName>
+    <VendorId>RATP</VendorId>
+    <VendorDescription>Revit AI-Powered Plugin Template</VendorDescription>
+  </AddIn>
+</RevitAddIns>

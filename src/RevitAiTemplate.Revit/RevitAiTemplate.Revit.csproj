@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>$(RevitTargetFramework)</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>RevitAiTemplate.Revit</AssemblyName>
+    <RootNamespace>RevitAiTemplate.Revit</RootNamespace>
+    <DefineConstants>$(DefineConstants);$(RevitConstants);REVIT$(RevitVersion)</DefineConstants>
+    <OutputPath>$(BaseOutputPath)$(MSBuildProjectName)\$(Configuration)\R$(RevitVersion)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="RevitAPI">
+      <HintPath>$(RevitInstallDir)\RevitAPI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="RevitAPIUI">
+      <HintPath>$(RevitInstallDir)\RevitAPIUI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RevitAiTemplate.Application\RevitAiTemplate.Application.csproj" />
+    <ProjectReference Include="..\RevitAiTemplate.Core\RevitAiTemplate.Core.csproj" />
+    <ProjectReference Include="..\RevitAiTemplate.Infrastructure\RevitAiTemplate.Infrastructure.csproj" />
+    <ProjectReference Include="..\RevitAiTemplate.Ui.Wpf\RevitAiTemplate.Ui.Wpf.csproj" />
+    <ProjectReference Include="..\RevitAiTemplate.RevitBridge\RevitAiTemplate.RevitBridge.csproj" />
+  </ItemGroup>
+</Project>

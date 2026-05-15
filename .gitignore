@@ -1,0 +1,15 @@
+.vs/
+.vscode/.ropeproject/
+bin/
+obj/
+artifacts/
+*.user
+*.suo
+*.cache
+*.log
+*.addin.local
+*.nupkg
+*.snupkg
+.env
+secrets.*
+appsettings.Production.json

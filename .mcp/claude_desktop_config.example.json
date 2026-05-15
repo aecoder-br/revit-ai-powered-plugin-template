@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "revit-ai-template": {
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "C:\\path\\to\\repo\\src\\RevitAiTemplate.Mcp.Server\\RevitAiTemplate.Mcp.Server.csproj",
+        "--no-launch-profile"
+      ]
+    }
+  }
+}

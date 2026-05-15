@@ -1,0 +1,24 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-shared:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8.x
+            10.x
+      - name: Restore
+        run: dotnet restore tests/RevitAiTemplate.Application.Tests/RevitAiTemplate.Application.Tests.csproj
+      - name: Test shared projects
+        run: dotnet test tests/RevitAiTemplate.Application.Tests/RevitAiTemplate.Application.Tests.csproj -c Release
+
+  # Full Revit add-in builds require Revit API DLLs on the runner.
+  # Use a self-hosted Windows runner with Revit installed for production CI.

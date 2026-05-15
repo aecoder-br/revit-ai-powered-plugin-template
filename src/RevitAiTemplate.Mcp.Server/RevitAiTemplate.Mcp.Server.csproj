@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>revit-ai-template-mcp</ToolCommandName>
+    <PackageType>McpServer</PackageType>
+    <PackageId>RevitAiTemplate.Mcp.Server</PackageId>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="ModelContextProtocol" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" />
+    <ProjectReference Include="..\RevitAiTemplate.RevitBridge\RevitAiTemplate.RevitBridge.csproj" />
+    <None Include="README.md" Pack="true" PackagePath="/" />
+    <None Include=".mcp\server.json" Pack="true" PackagePath="/.mcp/" />
+  </ItemGroup>
+</Project>

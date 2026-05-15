@@ -1,0 +1,7 @@
+---
+description: MCP and runtime AI rules
+alwaysApply: false
+globs: ["src/RevitAiTemplate.Mcp.Server/**/*.cs", "src/RevitAiTemplate.AiGateway/**/*.cs"]
+---
+
+MCP tools must be narrow, deterministic, documented, and separated into read-only/write categories. Do not expose arbitrary Revit API execution.

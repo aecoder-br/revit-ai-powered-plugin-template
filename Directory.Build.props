@@ -1,0 +1,44 @@
+<Project>
+  <PropertyGroup>
+    <Company>TemplateCompany</Company>
+    <Authors>TemplateCompany</Authors>
+    <Product>Revit AI-Powered Plugin Template</Product>
+    <RepositoryUrl>https://example.com/revit-ai-powered-plugin-template</RepositoryUrl>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)artifacts\bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)artifacts\obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(RevitVersion)' == ''">
+    <RevitVersion>2024</RevitVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(RevitVersion)' == '2024'">
+    <RevitInstallDir>C:\Program Files\Autodesk\Revit 2024</RevitInstallDir>
+    <RevitTargetFramework>net48</RevitTargetFramework>
+    <RevitConstants>REVIT2024;REVIT_NET48</RevitConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(RevitVersion)' == '2025'">
+    <RevitInstallDir>C:\Program Files\Autodesk\Revit 2025</RevitInstallDir>
+    <RevitTargetFramework>net8.0-windows</RevitTargetFramework>
+    <RevitConstants>REVIT2025;REVIT_NET8</RevitConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(RevitVersion)' == '2026'">
+    <RevitInstallDir>C:\Program Files\Autodesk\Revit 2026</RevitInstallDir>
+    <RevitTargetFramework>net8.0-windows</RevitTargetFramework>
+    <RevitConstants>REVIT2026;REVIT_NET8</RevitConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(RevitVersion)' == '2027'">
+    <RevitInstallDir>C:\Program Files\Autodesk\Revit 2027</RevitInstallDir>
+    <RevitTargetFramework>net10.0-windows</RevitTargetFramework>
+    <RevitConstants>REVIT2027;REVIT_NET10</RevitConstants>
+  </PropertyGroup>
+</Project>

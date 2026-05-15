@@ -1,0 +1,12 @@
+---
+description: Repository-wide rules for the Revit AI-Powered Plugin Template
+alwaysApply: true
+---
+
+Use AGENTS.md as the canonical source.
+
+Key constraints:
+- Revit API only in src/RevitAiTemplate.Revit.
+- ExternalEvent for modeless UI, MCP, background tasks, and named pipe requests.
+- Separate builds for Revit 2024, 2025, 2026, 2027.
+- Runtime AI calls go through AI Gateway.

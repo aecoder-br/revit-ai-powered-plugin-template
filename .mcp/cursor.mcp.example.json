@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "revit-ai-template": {
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "${workspaceFolder}\\src\\RevitAiTemplate.Mcp.Server\\RevitAiTemplate.Mcp.Server.csproj",
+        "--no-launch-profile"
+      ]
+    },
+    "autodesk-product-help": {
+      "type": "http",
+      "url": "https://developer.api.autodesk.com/knowledge/public/v1/mcp"
+    }
+  }
+}

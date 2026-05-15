@@ -1,0 +1,11 @@
+---
+description: Revit API implementation rules
+alwaysApply: false
+globs: ["src/RevitAiTemplate.Revit/**/*.cs"]
+---
+
+Before editing Revit API code, check:
+- valid API context;
+- transaction boundaries;
+- version-specific APIs;
+- whether DTO mapping is needed before leaving the adapter layer.
