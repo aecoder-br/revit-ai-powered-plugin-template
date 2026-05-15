@@ -1,0 +1,12 @@
+{
+  "_generated": "Generated conservative Claude Code adapter settings. Source: .agents/roster.json and .agents/workflows. Keep permissions restricted.",
+  "permissions": {
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean:*)",
+      "Bash(curl:*)",
+      "Bash(Invoke-WebRequest:*)"
+    ]
+  }
+}
