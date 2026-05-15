@@ -1,0 +1,14 @@
+---
+description: Generated routing rules for the canonical agent team
+alwaysApply: false
+---
+
+<!-- Generated agent adapter. Source: .agents/roster.json, .agents/skills/*/SKILL.md, .agents/workflows/*.md. -->
+
+Use `.agents/roster.json` as the role roster.
+Use `.agents/skills/<role>/SKILL.md` as the canonical instructions for each role.
+Use `.agents/workflows/feature-lifecycle.md`, `branch-isolation.md`, `handoff-contract.md`, and `validation-gates.md` for orchestration.
+
+Do not duplicate long skill content in Cursor rules.
+Do not enable destructive actions automatically.
+When parallel work is needed, assign path ownership before edits and validate diffs against allowed paths.
