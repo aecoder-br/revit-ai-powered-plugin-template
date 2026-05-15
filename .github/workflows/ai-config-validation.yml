@@ -13,6 +13,7 @@ on:
       - 'docs/security/mcp-security-policy.md'
       - 'scripts/validate-skills.ps1'
       - 'scripts/validate-ai-adapters.ps1'
+      - 'scripts/validate-toml.ps1'
       - '.github/workflows/ai-config-validation.yml'
   push:
     branches: [ main ]
@@ -27,9 +28,23 @@ on:
       - 'docs/security/mcp-security-policy.md'
       - 'scripts/validate-skills.ps1'
       - 'scripts/validate-ai-adapters.ps1'
+      - 'scripts/validate-toml.ps1'
       - '.github/workflows/ai-config-validation.yml'
 
 jobs:
+  lint-workflows:
+    name: Optional workflow lint
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # External lightweight dependency: rhysd/actionlint downloads/runs actionlint.
+      # This job is intentionally non-blocking to avoid making CI fragile when the dependency is unavailable.
+      - name: Run actionlint
+        uses: rhysd/actionlint@v1
+
   validate-ai-config:
     runs-on: windows-latest
 
@@ -61,28 +76,11 @@ jobs:
             }
           }
 
-      - name: Validate Codex config text
+      - name: Validate Codex TOML config
         shell: pwsh
         run: |
           $codexPath = Join-Path $env:GITHUB_WORKSPACE '.codex/config.toml'
-          if (-not (Test-Path -LiteralPath $codexPath)) {
-            Write-Host 'No .codex/config.toml found; skipping Codex config validation.'
-            return
-          }
-          $lines = Get-Content -LiteralPath $codexPath
-          $lineNumber = 0
-          foreach ($line in $lines) {
-            $lineNumber++
-            $trimmed = $line.Trim()
-            if ([string]::IsNullOrWhiteSpace($trimmed) -or $trimmed.StartsWith('#')) {
-              continue
-            }
-            $isSection = $trimmed -match '^\[[A-Za-z0-9_.-]+(\.[A-Za-z0-9_.-]+)*\]$'
-            $isAssignment = $trimmed -match '^[A-Za-z0-9_.-]+\s*=\s*.+$'
-            if (-not ($isSection -or $isAssignment)) {
-              throw "Basic TOML syntax check failed at .codex/config.toml:$lineNumber"
-            }
-          }
+          powershell -NoProfile -ExecutionPolicy Bypass -File scripts/validate-toml.ps1 -RootPath $env:GITHUB_WORKSPACE -Path $codexPath
 
       - name: Validate prompt files
         shell: pwsh

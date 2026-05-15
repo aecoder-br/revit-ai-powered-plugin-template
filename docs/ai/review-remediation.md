@@ -298,3 +298,93 @@ Results:
 - The matrix generated and validated samples for `AiTools` values `none`, `codex`, `claude`, `cursor`, `copilot`, and `multi`.
 - Each sample contained `docs/generated/template-options.md` with the expected selected `AiTools` value and no unreplaced `AiTools` or `RevitVersions` placeholders.
 - `scripts/check.ps1` passed skill validation and adapter parity validation, then failed at `dotnet test` with `NETSDK1045` because the local environment still lacks .NET SDK 10.0.
+
+## MEDIUM-004: CI did not lint GitHub Actions workflows with actionlint
+
+Status: mitigated.
+
+## Problem
+
+The final AI-powered template review found that CI validated repository content, but did not lint GitHub Actions workflow syntax with `actionlint`.
+
+This left workflow expression, shell, and indentation issues to manual review.
+
+## Changes
+
+- Added a non-blocking `lint-workflows` job to `.github/workflows/ai-config-validation.yml`.
+- The job uses `rhysd/actionlint@v1`.
+- The job is marked `continue-on-error: true` so the external dependency provides signal without making AI config validation fragile.
+- Added `docs/ai/ci-validation.md` to document the dependency and local/manual fallback.
+
+## Validation Notes
+
+Use:
+
+```powershell
+actionlint
+```
+
+If `actionlint` is not installed locally, review `.github/workflows/ai-config-validation.yml` manually and rely on the non-blocking CI job for additional feedback.
+
+## Validation Results
+
+Commands executed:
+
+```powershell
+Get-Command actionlint -ErrorAction SilentlyContinue
+powershell -NoProfile -ExecutionPolicy Bypass -Command "<PowerShell parser check for scripts/validate-toml.ps1 and scripts/check.ps1>"
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/validate-toml.ps1 -VerboseReport
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/check.ps1
+```
+
+Results:
+
+- `actionlint` was not installed in the local environment, so workflow linting was reviewed by reading `.github/workflows/ai-config-validation.yml` and is delegated to the non-blocking CI job.
+- PowerShell parser checks passed for `scripts/validate-toml.ps1` and `scripts/check.ps1`.
+- `validate-toml.ps1 -VerboseReport` passed with 14 passed checks, 0 warnings, and 0 failures.
+- `scripts/check.ps1` passed skill validation, adapter parity validation, and Codex TOML validation, then failed at `dotnet test` with `NETSDK1045` because the local environment still lacks .NET SDK 10.0.
+
+## LOW-002: Codex config syntax validation was intentionally shallow
+
+Status: mitigated with repository-focused validation.
+
+## Problem
+
+The final AI-powered template review found that `.codex/config.toml` validation was a shallow textual check.
+
+PowerShell does not include a native full TOML parser, and adding a heavy dependency would make the default CI more fragile.
+
+## Changes
+
+- Added `scripts/validate-toml.ps1`.
+- Replaced the inline TOML text check in `.github/workflows/ai-config-validation.yml` with the new script.
+- Updated `scripts/check.ps1` to call `scripts/validate-toml.ps1` when `.codex/config.toml` exists.
+- Added `docs/ai/ci-validation.md` documenting TOML validation scope and limitations.
+
+The validator checks section syntax, key/value syntax, duplicate sections, duplicate keys, balanced quoted strings, required Codex root keys, recognized conservative policy values, profile sections, and obvious secret-related terms.
+
+It remains a smoke parser for the repository's TOML subset, not a full TOML 1.0 parser.
+
+## Validation Notes
+
+Use:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/validate-toml.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/check.ps1
+```
+
+## Validation Results
+
+Commands executed:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/validate-toml.ps1 -VerboseReport
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/check.ps1
+```
+
+Results:
+
+- `validate-toml.ps1 -VerboseReport` passed with 14 passed checks, 0 warnings, and 0 failures.
+- `scripts/check.ps1` now calls `scripts/validate-toml.ps1` when `.codex/config.toml` exists.
+- `scripts/check.ps1` passed Codex TOML validation and then failed at `dotnet test` with `NETSDK1045` because the local environment still lacks .NET SDK 10.0.

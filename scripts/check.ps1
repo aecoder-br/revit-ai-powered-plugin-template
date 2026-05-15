@@ -74,6 +74,14 @@ if (Test-Path $agentRoster) {
     -Command { & $adapterValidator -RootPath $root -Tools All }
 }
 
+$codexConfig = Join-Path $root '.codex/config.toml'
+$tomlValidator = Join-Path $root 'scripts/validate-toml.ps1'
+if (Test-Path $codexConfig) {
+  Invoke-CheckedScriptBlock `
+    -Description 'Validating Codex TOML config...' `
+    -Command { & $tomlValidator -RootPath $root -Path $codexConfig }
+}
+
 Invoke-CheckedExternalCommand `
   -Description 'Restoring and testing shared projects...' `
   -FilePath 'dotnet' `
