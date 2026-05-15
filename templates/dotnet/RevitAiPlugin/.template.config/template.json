@@ -1,0 +1,157 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "AECoder",
+  "classifications": [
+    "Revit",
+    "AI",
+    "MCP",
+    "WPF",
+    "Plugin",
+    "Template"
+  ],
+  "identity": "AECoder.RevitAiPlugin",
+  "name": "Revit AI-Powered Plugin Template",
+  "shortName": "revit-ai-plugin",
+  "sourceName": "RevitAiTemplate",
+  "preferNameDirectory": true,
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "symbols": {
+    "CompanyName": {
+      "type": "parameter",
+      "datatype": "text",
+      "defaultValue": "TemplateCompany",
+      "description": "Company or organization name used for package metadata and docs.",
+      "replaces": "TemplateCompany"
+    },
+    "ProductName": {
+      "type": "parameter",
+      "datatype": "text",
+      "defaultValue": "Revit AI-Powered Plugin Template",
+      "description": "Human-readable product name used in package metadata and docs.",
+      "replaces": "Revit AI-Powered Plugin Template"
+    },
+    "RootNamespace": {
+      "type": "parameter",
+      "datatype": "text",
+      "defaultValue": "RevitAiTemplate",
+      "description": "Root namespace for generated projects.",
+      "replaces": "RevitAiTemplate"
+    },
+    "VendorId": {
+      "type": "parameter",
+      "datatype": "text",
+      "defaultValue": "RATP",
+      "description": "Four-character Revit add-in vendor id.",
+      "replaces": "RATP"
+    },
+    "RevitVersions": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "2024-2027",
+      "description": "Revit versions to target after generation.",
+      "choices": [
+        {
+          "choice": "2024",
+          "description": "Target Revit 2024."
+        },
+        {
+          "choice": "2025",
+          "description": "Target Revit 2025."
+        },
+        {
+          "choice": "2026",
+          "description": "Target Revit 2026."
+        },
+        {
+          "choice": "2027",
+          "description": "Target Revit 2027."
+        },
+        {
+          "choice": "2024-2027",
+          "description": "Target Revit 2024, 2025, 2026, and 2027."
+        }
+      ]
+    },
+    "AiTools": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "multi",
+      "description": "AI tool adapter set to prepare after generation.",
+      "choices": [
+        {
+          "choice": "none",
+          "description": "Do not prepare AI tool adapters."
+        },
+        {
+          "choice": "codex",
+          "description": "Prepare Codex configuration."
+        },
+        {
+          "choice": "claude",
+          "description": "Prepare Claude Code configuration."
+        },
+        {
+          "choice": "cursor",
+          "description": "Prepare Cursor configuration."
+        },
+        {
+          "choice": "copilot",
+          "description": "Prepare GitHub Copilot prompts and instructions."
+        },
+        {
+          "choice": "multi",
+          "description": "Prepare all repository-supported AI adapters."
+        }
+      ]
+    },
+    "IncludeMcpServer": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": "Keep the custom MCP server project in generated output."
+    },
+    "IncludeAutodeskProductHelpMcp": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": "Keep Autodesk Product Help MCP documentation and config examples."
+    },
+    "IncludeAiGateway": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": "Keep the AI Gateway project in generated output."
+    },
+    "IncludeWebView2": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "description": "Keep WebView2/WPF UI integration points in generated output."
+    },
+    "IncludeInstaller": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "false",
+      "description": "Keep installer planning assets in generated output."
+    },
+    "UseSlnFormat": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "sln",
+      "description": "Preferred Visual Studio solution format.",
+      "choices": [
+        {
+          "choice": "sln",
+          "description": "Use classic .sln for maximum compatibility."
+        },
+        {
+          "choice": "slnx",
+          "description": "Reserve .slnx for future Visual Studio template refinement."
+        }
+      ]
+    }
+  }
+}
