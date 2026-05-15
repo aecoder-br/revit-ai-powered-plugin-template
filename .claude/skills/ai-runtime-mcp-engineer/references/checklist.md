@@ -25,7 +25,16 @@
 ## Documentation Research
 
 - Use Autodesk Product Help MCP when available for API behavior research.
+- Use `.agents/skills/ai-runtime-mcp-engineer/references/autodesk-mcp.md` for Autodesk MCP setup and review notes.
 - Record documentation uncertainty when tooling is unavailable.
+
+## Security Policy
+
+- Follow `docs/security/mcp-security-policy.md`.
+- Validate all MCP inputs before execution.
+- Sanitize tool outputs before they enter model prompts.
+- Log tool name, input summary, user confirmation, and result summary without secrets.
+- Reject tools that execute arbitrary Revit API.
 
 ## Validation
 
