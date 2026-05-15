@@ -51,6 +51,12 @@ If a Revit version is not installed, explain that the corresponding build could 
 - Write MCP tools require user confirmation, audit logging, and transaction rollback behavior.
 - Do not expose broad "execute arbitrary Revit API" tools.
 
+## Repository agent skills
+
+- `.agents/skills` is the canonical source for repository-local agent skills.
+- `.agents/workflows` contains shared feature lifecycle, branch isolation, handoff, and validation workflows.
+- Keep `AGENTS.md` concise; place detailed agent procedures in `.agents` instead of duplicating them here.
+
 ## Done means
 
 - Requested behavior implemented.

@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "canonicalSkillsPath": ".agents/skills",
+  "workflowsPath": ".agents/workflows",
+  "statePath": ".agents/state",
+  "roles": [
+    {
+      "name": "orchestrator-feature-lead",
+      "purpose": "Own feature decomposition, agent assignment, dependency ordering, and integration readiness."
+    },
+    {
+      "name": "branch-coordinator",
+      "purpose": "Own branch, worktree, path ownership, and handoff coordination."
+    },
+    {
+      "name": "product-manager",
+      "purpose": "Clarify user value, scope boundaries, acceptance criteria, and release impact."
+    },
+    {
+      "name": "requirements-analyst",
+      "purpose": "Convert requests into precise functional, non-functional, and validation requirements."
+    },
+    {
+      "name": "revit-api-senior",
+      "purpose": "Review and implement Revit API work inside the valid Revit context and adapter boundary."
+    },
+    {
+      "name": "revit-multiversion-architect",
+      "purpose": "Own Revit 2024-2027 framework, constants, API compatibility, and build strategy decisions."
+    },
+    {
+      "name": "csharp-clean-architecture",
+      "purpose": "Protect Core/Application boundaries, DTO contracts, dependency direction, and maintainable C# design."
+    },
+    {
+      "name": "wpf-webview2-ux-ui",
+      "purpose": "Own WPF, MVVM, WebView2 interaction, modeless UI safety, and user experience quality."
+    },
+    {
+      "name": "ai-runtime-mcp-engineer",
+      "purpose": "Design deterministic MCP tools, bridge contracts, and safe runtime AI integration."
+    },
+    {
+      "name": "ai-gateway-backend-engineer",
+      "purpose": "Own AI Gateway routing, provider isolation, policy enforcement, redaction, and audit behavior."
+    },
+    {
+      "name": "data-persistence-engineer",
+      "purpose": "Own local persistence, configuration storage, migrations, and data durability rules."
+    },
+    {
+      "name": "cybersecurity-privacy-engineer",
+      "purpose": "Review secrets, privacy, data minimization, audit logging, and external data sharing risk."
+    },
+    {
+      "name": "qa-automation-engineer",
+      "purpose": "Own automated tests, regression coverage, validation strategy, and reproducible test evidence."
+    },
+    {
+      "name": "devops-release-engineer",
+      "purpose": "Own CI, build scripts, release automation, signing, and environment reproducibility."
+    },
+    {
+      "name": "installer-packaging-engineer",
+      "purpose": "Own installer packaging, add-in deployment, versioned outputs, and local install/uninstall flows."
+    },
+    {
+      "name": "visual-studio-template-engineer",
+      "purpose": "Own Visual Studio solution, dotnet new packaging, and multi-project template behavior."
+    },
+    {
+      "name": "technical-writer",
+      "purpose": "Own clear technical documentation, ADR updates, handoff notes, and user-facing setup guidance."
+    },
+    {
+      "name": "pr-reviewer",
+      "purpose": "Review diffs for correctness, regressions, architecture drift, missing tests, and operational risk."
+    },
+    {
+      "name": "verifier",
+      "purpose": "Run independent validation gates and report exact commands, results, blockers, and residual risk."
+    }
+  ]
+}
