@@ -148,3 +148,52 @@ Results:
 - `validate-skills.ps1 -IncludeMirrors` passed with 60 validated skills after the lock-script change.
 - `scripts/check.ps1` was run after the lock-script change and failed at `dotnet test` with `NETSDK1045` because the local environment still lacks .NET SDK 10.0. This confirms the corrected check script propagates executed command failures.
 - Temporary test artifacts were removed after validation.
+
+## MEDIUM-001: AI tool adapters could drift from the canonical roster
+
+Status: remediated operationally.
+
+## Problem
+
+The final AI-powered template review found that `scripts/setup-ai-tools.ps1` refreshes Claude and Cursor skill mirrors, but did not validate all tool-specific adapter surfaces against `.agents/roster.json`.
+
+This meant `.claude/agents`, `.cursor/agents`, `.codex/config.toml`, `.github/prompts`, and tool documentation could drift from the canonical `.agents/skills` layer.
+
+## Changes
+
+- Added `scripts/validate-ai-adapters.ps1`.
+- Added `.codex/README.md` to document that Codex uses `.agents/skills` as the canonical skill source.
+- Added `docs/ai/adapter-parity-validation.md`.
+- Updated `scripts/check.ps1` to call adapter parity validation when `.agents/roster.json` exists.
+- Updated `.github/workflows/ai-config-validation.yml` to run adapter parity validation in CI.
+
+## Validation Notes
+
+Use:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/validate-ai-adapters.ps1 -Tools All
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/validate-ai-adapters.ps1 -Tools All -FailOnWarnings
+```
+
+The validator reports drift only. It does not generate, overwrite, or delete adapters.
+
+## Validation Results
+
+Commands executed:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "<PowerShell parser check for scripts/validate-ai-adapters.ps1 and scripts/check.ps1>"
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/validate-ai-adapters.ps1 -Tools All
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/validate-ai-adapters.ps1 -Tools All -FailOnWarnings
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/validate-ai-adapters.ps1 -Tools All -VerboseReport
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/check.ps1
+```
+
+Results:
+
+- PowerShell parser check passed for `scripts/validate-ai-adapters.ps1` and `scripts/check.ps1`.
+- `validate-ai-adapters.ps1 -Tools All` passed with 84 passed checks, 0 warnings, and 0 failures.
+- `validate-ai-adapters.ps1 -Tools All -FailOnWarnings` passed with 84 passed checks, 0 warnings, and 0 failures.
+- `validate-ai-adapters.ps1 -Tools All -VerboseReport` passed and listed canonical skills, Claude mirrors, Cursor mirrors, primary agent adapter references, Codex files, and Copilot prompts.
+- `scripts/check.ps1` now runs adapter parity validation after skill validation. It passed adapter parity validation, then failed at `dotnet test` with `NETSDK1045` because the local environment still lacks .NET SDK 10.0.

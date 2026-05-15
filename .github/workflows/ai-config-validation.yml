@@ -12,6 +12,7 @@ on:
       - 'docs/ai/**'
       - 'docs/security/mcp-security-policy.md'
       - 'scripts/validate-skills.ps1'
+      - 'scripts/validate-ai-adapters.ps1'
       - '.github/workflows/ai-config-validation.yml'
   push:
     branches: [ main ]
@@ -25,6 +26,7 @@ on:
       - 'docs/ai/**'
       - 'docs/security/mcp-security-policy.md'
       - 'scripts/validate-skills.ps1'
+      - 'scripts/validate-ai-adapters.ps1'
       - '.github/workflows/ai-config-validation.yml'
 
 jobs:
@@ -37,6 +39,10 @@ jobs:
       - name: Validate agent skills and mirrors
         shell: pwsh
         run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/validate-skills.ps1 -RootPath $env:GITHUB_WORKSPACE -IncludeMirrors
+
+      - name: Validate AI adapter parity
+        shell: pwsh
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/validate-ai-adapters.ps1 -RootPath $env:GITHUB_WORKSPACE -Tools All -FailOnWarnings
 
       - name: Validate roster JSON
         shell: pwsh

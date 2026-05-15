@@ -66,6 +66,14 @@ if (Test-Path $agentSkills) {
     -Command { & $skillValidator -RootPath $root -IncludeMirrors }
 }
 
+$agentRoster = Join-Path $root '.agents/roster.json'
+$adapterValidator = Join-Path $root 'scripts/validate-ai-adapters.ps1'
+if (Test-Path $agentRoster) {
+  Invoke-CheckedScriptBlock `
+    -Description 'Validating AI adapter parity...' `
+    -Command { & $adapterValidator -RootPath $root -Tools All }
+}
+
 Invoke-CheckedExternalCommand `
   -Description 'Restoring and testing shared projects...' `
   -FilePath 'dotnet' `
