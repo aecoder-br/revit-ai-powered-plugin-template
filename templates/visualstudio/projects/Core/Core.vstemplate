@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005">
+  <TemplateData>
+    <Name>Revit AI Plugin Core</Name>
+    <Description>Core domain project for the Revit AI-powered plugin template.</Description>
+    <ProjectType>CSharp</ProjectType>
+    <SortOrder>1000</SortOrder>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>RevitAiPlugin.Core</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="RevitAiPlugin.Core.csproj" ReplaceParameters="true" />
+  </TemplateContent>
+</VSTemplate>

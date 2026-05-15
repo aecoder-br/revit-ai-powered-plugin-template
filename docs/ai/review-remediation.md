@@ -388,3 +388,53 @@ Results:
 - `validate-toml.ps1 -VerboseReport` passed with 14 passed checks, 0 warnings, and 0 failures.
 - `scripts/check.ps1` now calls `scripts/validate-toml.ps1` when `.codex/config.toml` exists.
 - `scripts/check.ps1` passed Codex TOML validation and then failed at `dotnet test` with `NETSDK1045` because the local environment still lacks .NET SDK 10.0.
+
+## LOW-001: Visual Studio ProjectGroup template child templates were incomplete
+
+Status: mitigated by documentation, roadmap, and a Core child-template skeleton.
+
+## Problem
+
+The final AI-powered template review found that `templates/visualstudio/RevitAiPlugin.ProjectGroup.vstemplate` validates as XML, but the linked child project templates are not complete.
+
+The repository already described the Visual Studio template as a base, but needed a more concrete v2 plan and clearer wording that v1 is not production-ready.
+
+## Changes
+
+- Added `docs/ai/visual-studio-template-v2-plan.md`.
+- Updated `templates/visualstudio/README.md` to state that the current Visual Studio template is a v1 base, not a complete or production-ready template.
+- Documented the v2 child project template plan for all 9 projects.
+- Documented namespace, `CompanyName`, `ProductName`, and `VendorId` substitution strategy.
+- Documented conditional inclusion strategy for MCP, AI Gateway, WebView2, and Installer.
+- Documented preservation of the Revit 2024-2027 multi-version strategy.
+- Documented integration with `scripts/setup-ai-tools.ps1`.
+- Documented the v3 VSIX + `IWizard` strategy.
+- Added a minimal `projects/Core` child template skeleton as a reference pattern only.
+
+## Validation Notes
+
+Use:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[xml](Get-Content -Raw ./templates/visualstudio/RevitAiPlugin.ProjectGroup.vstemplate) | Out-Null"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[xml](Get-Content -Raw ./templates/visualstudio/projects/Core/Core.vstemplate) | Out-Null"
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/check.ps1
+```
+
+## Validation Results
+
+Commands executed:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[xml](Get-Content -Raw ./templates/visualstudio/RevitAiPlugin.ProjectGroup.vstemplate) | Out-Null"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "[xml](Get-Content -Raw ./templates/visualstudio/projects/Core/Core.vstemplate) | Out-Null"
+git diff --check
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/check.ps1
+```
+
+Results:
+
+- Root `RevitAiPlugin.ProjectGroup.vstemplate` parsed successfully as XML.
+- Reference `projects/Core/Core.vstemplate` parsed successfully as XML.
+- `git diff --check` passed.
+- `scripts/check.ps1` passed skill validation, adapter parity validation, and Codex TOML validation, then failed at `dotnet test` with `NETSDK1045` because the local environment still lacks .NET SDK 10.0.
