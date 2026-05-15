@@ -1,0 +1,11 @@
+{
+  "featureId": "",
+  "taskId": "",
+  "role": "",
+  "branch": "",
+  "worktree": "",
+  "ownedPaths": [],
+  "readOnlyPaths": [],
+  "blockedPaths": [],
+  "status": "planned"
+}
