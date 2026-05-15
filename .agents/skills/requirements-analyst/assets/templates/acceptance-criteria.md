@@ -1,0 +1,19 @@
+# Acceptance Criteria
+
+## AC-001
+
+Given ...
+When ...
+Then ...
+
+## Failure Paths
+
+- Given ...
+  When ...
+  Then ...
+
+## Revit Version Matrix
+
+| Criteria | Revit 2024 | Revit 2025 | Revit 2026 | Revit 2027 |
+|---|---|---|---|---|
+| AC-001 |  |  |  |  |
