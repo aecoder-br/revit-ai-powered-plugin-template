@@ -1,0 +1,20 @@
+name: ai-config-validation
+
+on:
+  pull_request:
+    paths:
+      - '.agents/**'
+      - '.claude/skills/**'
+      - '.cursor/skills/**'
+      - 'docs/ai/skill-validation.md'
+      - 'scripts/validate-skills.ps1'
+      - '.github/workflows/ai-config-validation.yml'
+
+jobs:
+  validate-agent-skills:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate agent skills
+        shell: powershell
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/validate-skills.ps1 -RootPath $env:GITHUB_WORKSPACE -IncludeMirrors

@@ -13,6 +13,16 @@ if (Test-Path $solution) {
   Write-Warning "Visual Studio solution not found at $solution."
 }
 
+$agentSkills = Join-Path $root '.agents/skills'
+$skillValidator = Join-Path $root 'scripts/validate-skills.ps1'
+if (Test-Path $agentSkills) {
+  Write-Host 'Validating agent skills...' -ForegroundColor Cyan
+  & $skillValidator -RootPath $root -IncludeMirrors
+  if ($LASTEXITCODE -ne 0) {
+    throw "Agent skill validation failed with exit code $LASTEXITCODE."
+  }
+}
+
 Write-Host 'Restoring and testing shared projects...' -ForegroundColor Cyan
 dotnet test (Join-Path $root 'tests/RevitAiTemplate.Application.Tests/RevitAiTemplate.Application.Tests.csproj') -c $Configuration
 
