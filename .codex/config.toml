@@ -1,0 +1,67 @@
+# Generated Codex adapter config. Source: .agents/roster.json, .agents/skills/*/SKILL.md, and .agents/workflows/*.md.
+# Codex should use .agents/skills as the canonical skill layer for this repository.
+# Do not assume Codex reads .codex/agents/*.md; this file only defines conservative defaults and profiles.
+# Keep permissions restricted. Do not enable destructive execution, broad filesystem access, or automatic network access by default.
+
+model_reasoning_effort = "medium"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+[features]
+multi_agent = true
+
+# Agent profile: orchestrator-feature-lead
+# Description: feature intake, plan mode, decomposition, path ownership, assignment, and sequencing.
+# Canonical skill: .agents/skills/orchestrator-feature-lead/SKILL.md
+[profiles.orchestrator-feature-lead]
+model_reasoning_effort = "high"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+# Agent profile: branch-coordinator
+# Description: branch naming, worktree setup, path locks, diff validation, and merge order.
+# Canonical skill: .agents/skills/branch-coordinator/SKILL.md
+[profiles.branch-coordinator]
+model_reasoning_effort = "medium"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+# Agent profile: revit-api-senior
+# Description: Revit API context, ExternalEvent routing, transactions, and model write review.
+# Canonical skill: .agents/skills/revit-api-senior/SKILL.md
+[profiles.revit-api-senior]
+model_reasoning_effort = "high"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+# Agent profile: revit-multiversion-architect
+# Description: Revit 2024-2027 target frameworks, conditional compilation, adapters, and validation.
+# Canonical skill: .agents/skills/revit-multiversion-architect/SKILL.md
+[profiles.revit-multiversion-architect]
+model_reasoning_effort = "high"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+# Agent profile: cybersecurity-privacy-engineer
+# Description: threat modeling, privacy review, MCP permissions, prompt injection, secrets, and safe logging.
+# Canonical skill: .agents/skills/cybersecurity-privacy-engineer/SKILL.md
+[profiles.cybersecurity-privacy-engineer]
+model_reasoning_effort = "high"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+# Agent profile: qa-automation-engineer
+# Description: unit tests, fake-based adapter tests, Revit smoke tests, regression checks, and version validation.
+# Canonical skill: .agents/skills/qa-automation-engineer/SKILL.md
+[profiles.qa-automation-engineer]
+model_reasoning_effort = "medium"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+# Agent profile: verifier
+# Description: skeptical pass/fail verification, relevant checks, allowed-path review, and evidence.
+# Canonical skill: .agents/skills/verifier/SKILL.md
+[profiles.verifier]
+model_reasoning_effort = "medium"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
