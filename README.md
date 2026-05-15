@@ -56,6 +56,23 @@ Use the solution for navigation, editing, tests, and shared project builds. For 
 
 If a Revit version is not installed, the build script skips that version and reports the missing install folder.
 
+## Using as Visual Studio template
+
+The recommended creation path today is the `dotnet new` template, followed by opening the generated solution in Visual Studio:
+
+```powershell
+./scripts/pack-dotnet-template.ps1 -Force -Install
+dotnet new revit-ai-plugin -n MyRevitPlugin --AiTools multi
+```
+
+The native Visual Studio template base is documented in `docs/ai/visual-studio-template.md` and staged from `templates/visualstudio`.
+
+Roadmap:
+
+- v1: use `dotnet new` and open the generated `.sln`.
+- v2: package a complete Visual Studio `ProjectGroup` template.
+- v3: ship a VSIX with an `IWizard` for product name, namespace, Revit versions, AI tools, MCP, AI Gateway, WebView2, and installer choices.
+
 ## Build
 
 ```powershell
