@@ -52,6 +52,7 @@
       "datatype": "choice",
       "defaultValue": "2024-2027",
       "description": "Revit versions to target after generation.",
+      "replaces": "__RevitVersions__",
       "choices": [
         {
           "choice": "2024",
@@ -80,6 +81,7 @@
       "datatype": "choice",
       "defaultValue": "multi",
       "description": "AI tool adapter set to prepare after generation.",
+      "replaces": "__AiTools__",
       "choices": [
         {
           "choice": "none",
@@ -111,31 +113,36 @@
       "type": "parameter",
       "datatype": "bool",
       "defaultValue": "true",
-      "description": "Keep the custom MCP server project in generated output."
+      "description": "Keep the custom MCP server project in generated output.",
+      "replaces": "__IncludeMcpServer__"
     },
     "IncludeAutodeskProductHelpMcp": {
       "type": "parameter",
       "datatype": "bool",
       "defaultValue": "true",
-      "description": "Keep Autodesk Product Help MCP documentation and config examples."
+      "description": "Keep Autodesk Product Help MCP documentation and config examples.",
+      "replaces": "__IncludeAutodeskProductHelpMcp__"
     },
     "IncludeAiGateway": {
       "type": "parameter",
       "datatype": "bool",
       "defaultValue": "true",
-      "description": "Keep the AI Gateway project in generated output."
+      "description": "Keep the AI Gateway project in generated output.",
+      "replaces": "__IncludeAiGateway__"
     },
     "IncludeWebView2": {
       "type": "parameter",
       "datatype": "bool",
       "defaultValue": "true",
-      "description": "Keep WebView2/WPF UI integration points in generated output."
+      "description": "Keep WebView2/WPF UI integration points in generated output.",
+      "replaces": "__IncludeWebView2__"
     },
     "IncludeInstaller": {
       "type": "parameter",
       "datatype": "bool",
       "defaultValue": "false",
-      "description": "Keep installer planning assets in generated output."
+      "description": "Keep installer planning assets in generated output.",
+      "replaces": "__IncludeInstaller__"
     },
     "UseSlnFormat": {
       "type": "parameter",
@@ -152,6 +159,52 @@
           "description": "Reserve .slnx for future Visual Studio template refinement."
         }
       ]
+    },
+    "AiToolsIsNone": {
+      "type": "computed",
+      "value": "(AiTools == \"none\")"
+    },
+    "AiToolsIsCodex": {
+      "type": "computed",
+      "value": "(AiTools == \"codex\")"
+    },
+    "AiToolsIsClaude": {
+      "type": "computed",
+      "value": "(AiTools == \"claude\")"
+    },
+    "AiToolsIsCursor": {
+      "type": "computed",
+      "value": "(AiTools == \"cursor\")"
+    },
+    "AiToolsIsCopilot": {
+      "type": "computed",
+      "value": "(AiTools == \"copilot\")"
+    },
+    "AiToolsIsMulti": {
+      "type": "computed",
+      "value": "(AiTools == \"multi\")"
+    },
+    "UsesSingleRevitVersion": {
+      "type": "computed",
+      "value": "(RevitVersions != \"2024-2027\")"
     }
-  }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(!IncludeInstaller)",
+          "exclude": [
+            "installer/**"
+          ]
+        },
+        {
+          "condition": "(!IncludeAutodeskProductHelpMcp)",
+          "exclude": [
+            ".mcp/autodesk-product-help.*"
+          ]
+        }
+      ]
+    }
+  ]
 }

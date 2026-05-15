@@ -245,3 +245,56 @@ Results:
 - `setup-ai-tools.ps1 -Tools All -Mode Copy -Validate -ValidateAdapters` passed. Existing Claude/Cursor mirrors were skipped without `-Force`, Codex/Copilot static adapters were validated, skill validation passed with 60 skills, and adapter parity passed with 84 checks.
 - `setup-ai-tools.ps1 -Tools Codex,Copilot -ValidateAdapters` passed. The script accepts the comma-separated tool list used by `powershell -File`, validated Codex/Copilot static adapters, and adapter parity passed with 32 checks.
 - `scripts/check.ps1` passed skill validation and adapter parity validation, then failed at `dotnet test` with `NETSDK1045` because the local environment still lacks .NET SDK 10.0.
+
+## MEDIUM-003: dotnet template choices were mostly declarative
+
+Status: mitigated for v1.
+
+## Problem
+
+The final AI-powered template review found that `AiTools`, `RevitVersions`, and include flags existed as dotnet template symbols, but did not yet remove or include projects and files conditionally.
+
+This could confuse users who selected a narrow option such as `--AiTools none` and still received the full professional template surface.
+
+## Changes
+
+- Added `docs/generated/template-options.md` as a generated creation record.
+- Added replacements for `RevitVersions`, `AiTools`, `IncludeMcpServer`, `IncludeAutodeskProductHelpMcp`, `IncludeAiGateway`, `IncludeWebView2`, and `IncludeInstaller`.
+- Added computed symbols in `template.json` to prepare future conditional template modifiers.
+- Added safe conditional modifiers for non-solution assets:
+  - exclude `installer/**` when `IncludeInstaller` is false;
+  - exclude Autodesk Product Help MCP examples when `IncludeAutodeskProductHelpMcp` is false.
+- Updated `scripts/pack-dotnet-template.ps1` with `-TestMatrix`.
+- The test matrix generates samples for `AiTools` values `none`, `codex`, `claude`, `cursor`, `copilot`, and `multi`.
+- Each generated sample is checked for `docs/generated/template-options.md` and the selected `AiTools` value.
+- README documentation now states that v1 records selected options but does not yet perform complete conditional removal of projects, solution entries, adapters, or docs.
+
+## Validation Notes
+
+Use:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-Content -Raw ./templates/dotnet/RevitAiPlugin/.template.config/template.json | ConvertFrom-Json | Out-Null"
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/pack-dotnet-template.ps1 -TestMatrix
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/check.ps1
+```
+
+## Validation Results
+
+Commands executed:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-Content -Raw ./templates/dotnet/RevitAiPlugin/.template.config/template.json | ConvertFrom-Json | Out-Null"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "<PowerShell parser check for scripts/pack-dotnet-template.ps1>"
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/pack-dotnet-template.ps1 -TestMatrix
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/check.ps1
+```
+
+Results:
+
+- `template.json` parsed successfully as JSON.
+- PowerShell parser check passed for `scripts/pack-dotnet-template.ps1`.
+- `pack-dotnet-template.ps1 -TestMatrix` passed after recreating the staged template under `artifacts/templates/RevitAiPlugin`.
+- The matrix generated and validated samples for `AiTools` values `none`, `codex`, `claude`, `cursor`, `copilot`, and `multi`.
+- Each sample contained `docs/generated/template-options.md` with the expected selected `AiTools` value and no unreplaced `AiTools` or `RevitVersions` placeholders.
+- `scripts/check.ps1` passed skill validation and adapter parity validation, then failed at `dotnet test` with `NETSDK1045` because the local environment still lacks .NET SDK 10.0.

@@ -137,6 +137,17 @@ Use the `dotnet new` template first:
 dotnet new revit-ai-plugin -n MyRevitPlugin --AiTools multi
 ```
 
+The v1 dotnet template records selected options in `docs/generated/template-options.md` inside the generated project. `AiTools`, `RevitVersions`, and include flags are currently declarative setup choices; they do not yet remove every unused project, solution entry, adapter, or documentation file.
+
+Currently included in every generated project:
+
+- the Visual Studio solution and core multi-project architecture;
+- Revit 2024-2027 build structure and validation scripts;
+- canonical `.agents/skills`, workflows, and AI setup scripts;
+- Revit bridge, WPF UI, MCP server, AI Gateway, and tests.
+
+Only safe non-solution assets are conditionally excluded in v1, such as installer planning files when `IncludeInstaller` is false.
+
 Then open the generated `.sln` in Visual Studio and run the relevant setup:
 
 ```powershell

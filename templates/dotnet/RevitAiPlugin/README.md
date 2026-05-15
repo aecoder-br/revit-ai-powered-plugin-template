@@ -4,6 +4,17 @@ This folder contains the manifest for the `revit-ai-plugin` dotnet template.
 
 The repository is not moved into this folder. Instead, `scripts/pack-dotnet-template.ps1` creates a staging template under `artifacts/templates/RevitAiPlugin` from the current repository root and copies `.template.config/template.json` into that staged content.
 
+The v1 template records selected options in `docs/generated/template-options.md` in every generated project. This makes `AiTools`, `RevitVersions`, and include flags visible after creation while conditional removal is still being refined.
+
+Currently included in every generated project:
+
+- the Visual Studio solution and core multi-project architecture;
+- Revit 2024-2027 build structure and validation scripts;
+- canonical `.agents/skills`, workflows, and AI setup scripts;
+- Revit bridge, WPF UI, MCP server, AI Gateway, and tests.
+
+Only safe non-solution assets are conditionally excluded in v1, such as installer planning files when `IncludeInstaller` is false.
+
 ## Pack
 
 From the repository root:
@@ -67,6 +78,8 @@ For a single tool, map the template choice to the setup script:
 
 Claude and Cursor refresh skill mirrors. Codex and Copilot validate static adapters and create missing files only.
 
+Current limitation: selecting `--AiTools none` does not remove every AI-related file. The generated project includes the full professional template surface, and `docs/generated/template-options.md` records the selected intent so teams can prune deliberately.
+
 ## Revit Version Choices
 
 Use `--RevitVersions` to record the intended Revit version range:
@@ -78,6 +91,18 @@ Use `--RevitVersions` to record the intended Revit version range:
 - `2024-2027`
 
 Current limitation: this base template defines the parameter but does not yet remove project files, solution entries, constants, or docs for unselected versions. The generated project still contains the multi-version template and should be refined by a later template-conditioning step.
+
+The selected value is recorded in `docs/generated/template-options.md`.
+
+## Test Matrix
+
+Validate the template across the supported `AiTools` choices:
+
+```powershell
+./scripts/pack-dotnet-template.ps1 -TestMatrix
+```
+
+This generates samples under `artifacts/template-test` for `none`, `codex`, `claude`, `cursor`, `copilot`, and `multi`, then checks that `docs/generated/template-options.md` reflects the selected value in each sample.
 
 ## Solution Format
 

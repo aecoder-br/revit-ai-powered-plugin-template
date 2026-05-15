@@ -3,6 +3,7 @@ param(
   [string]$OutputPath,
   [switch]$Install,
   [switch]$Test,
+  [switch]$TestMatrix,
   [switch]$Force
 )
 
@@ -124,7 +125,7 @@ function Invoke-DotNetNew {
 }
 
 if (Test-Path -LiteralPath $output) {
-  if (-not $Force) {
+  if (-not $Force -and -not $TestMatrix) {
     throw "Template output already exists: $output. Re-run with -Force to replace it."
   }
 
@@ -142,7 +143,7 @@ Copy-Item -LiteralPath (Join-Path $templateConfigSource 'template.json') -Destin
 Write-Host 'Template staged successfully.' -ForegroundColor Green
 Write-Host "Install with: dotnet new install `"$output`"" -ForegroundColor Green
 
-if ($Install -or $Test) {
+if ($Install -or $Test -or $TestMatrix) {
   $uninstallExitCode = Invoke-DotNetNew -Arguments @('new', 'uninstall', $output)
   if ($uninstallExitCode -ne 0) {
     Write-Host "Template was not previously installed from $output, continuing." -ForegroundColor DarkYellow
@@ -154,47 +155,99 @@ if ($Install -or $Test) {
   }
 }
 
-if ($Test) {
-  $testRoot = Join-Path $root 'artifacts\template-test'
-  $sampleOutput = Join-Path $testRoot 'SampleRevitPlugin'
+function Assert-GeneratedTemplateOptions {
+  param(
+    [string]$SampleOutput,
+    [string]$ExpectedAiTools
+  )
 
-  if (Test-Path -LiteralPath $sampleOutput) {
-    if (-not $Force) {
-      throw "Template test output already exists: $sampleOutput. Re-run with -Force to replace it."
-    }
-
-    Assert-PathInside -ChildPath $sampleOutput -ParentPath $testRoot -Message "Refusing to remove test output outside template-test: $sampleOutput"
-    Remove-Item -LiteralPath $sampleOutput -Recurse -Force
+  $optionsPath = Join-Path $SampleOutput 'docs\generated\template-options.md'
+  if (-not (Test-Path -LiteralPath $optionsPath)) {
+    throw "Generated template options file was not found: $optionsPath"
   }
 
-  New-Item -ItemType Directory -Force -Path $testRoot | Out-Null
+  $optionsText = Get-Content -Raw -LiteralPath $optionsPath
+  $expectedLine = "| AiTools | $ExpectedAiTools |"
+  if (-not $optionsText.Contains($expectedLine)) {
+    throw "Generated template options file does not contain expected AiTools value '$ExpectedAiTools': $optionsPath"
+  }
+
+  if (-not $optionsText.Contains('| RevitVersions | 2024-2027 |')) {
+    throw "Generated template options file does not contain expected default RevitVersions value '2024-2027': $optionsPath"
+  }
+
+  if ($optionsText -match '__[A-Za-z0-9]+__') {
+    throw "Generated template options file still contains unreplaced option placeholders: $optionsPath"
+  }
+}
+
+function New-TemplateSample {
+  param(
+    [string]$TestRoot,
+    [string]$SampleName,
+    [string]$AiTools
+  )
+
+  $sampleOutput = Join-Path $TestRoot $SampleName
+
+  if (Test-Path -LiteralPath $sampleOutput) {
+    Assert-PathInside -ChildPath $sampleOutput -ParentPath $TestRoot -Message "Refusing to remove test output outside template-test: $sampleOutput"
+    Remove-Item -LiteralPath $sampleOutput -Recurse -Force
+  }
 
   $testExitCode = Invoke-DotNetNew -Arguments @(
     'new',
     'revit-ai-plugin',
     '-n',
-    'SampleRevitPlugin',
+    $SampleName,
     '--AiTools',
-    'multi',
+    $AiTools,
     '--CompanyName',
     'Sample Company',
     '--ProductName',
-    'Sample Revit Plugin',
+    "Sample $SampleName",
     '--RootNamespace',
-    'SampleRevitPlugin',
+    $SampleName,
     '--VendorId',
     'SAMP',
     '-o',
     $sampleOutput
   )
   if ($testExitCode -ne 0) {
-    throw "dotnet new revit-ai-plugin test failed with exit code $testExitCode."
+    throw "dotnet new revit-ai-plugin test failed for AiTools '$AiTools' with exit code $testExitCode."
   }
 
-  $sampleSolution = Join-Path $sampleOutput 'SampleRevitPlugin.sln'
+  $sampleSolution = Join-Path $sampleOutput "$SampleName.sln"
   if (-not (Test-Path -LiteralPath $sampleSolution)) {
     throw "Generated sample solution was not found: $sampleSolution"
   }
 
-  Write-Host "Template test generated: $sampleOutput" -ForegroundColor Green
+  Assert-GeneratedTemplateOptions -SampleOutput $sampleOutput -ExpectedAiTools $AiTools
+  Write-Host "Template sample generated and validated: $sampleOutput" -ForegroundColor Green
+}
+
+if ($Test) {
+  $testRoot = Join-Path $root 'artifacts\template-test'
+  New-Item -ItemType Directory -Force -Path $testRoot | Out-Null
+  New-TemplateSample -TestRoot $testRoot -SampleName 'SampleRevitPlugin' -AiTools 'multi'
+}
+
+if ($TestMatrix) {
+  $testRoot = Join-Path $root 'artifacts\template-test'
+  New-Item -ItemType Directory -Force -Path $testRoot | Out-Null
+
+  $matrix = @(
+    @{ Name = 'SampleAiToolsNone'; AiTools = 'none' },
+    @{ Name = 'SampleAiToolsCodex'; AiTools = 'codex' },
+    @{ Name = 'SampleAiToolsClaude'; AiTools = 'claude' },
+    @{ Name = 'SampleAiToolsCursor'; AiTools = 'cursor' },
+    @{ Name = 'SampleAiToolsCopilot'; AiTools = 'copilot' },
+    @{ Name = 'SampleAiToolsMulti'; AiTools = 'multi' }
+  )
+
+  foreach ($sample in $matrix) {
+    New-TemplateSample -TestRoot $testRoot -SampleName $sample.Name -AiTools $sample.AiTools
+  }
+
+  Write-Host 'Template test matrix completed.' -ForegroundColor Green
 }
