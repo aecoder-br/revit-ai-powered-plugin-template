@@ -33,7 +33,11 @@ Use `assets/templates/output.md` when writing a file-based output.
 
 - `references/checklist.md`
 - `references/examples.md`
+- `references/autodesk-mcp.md`
 - `docs/architecture/mcp-strategy.md`
+- `docs/ai/mcp-development-workflow.md`
+- `docs/security/mcp-security-policy.md`
+- `.mcp/revit-public-mcp-notes.md`
 
 ## Guardrails
 
