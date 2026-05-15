@@ -1,0 +1,6 @@
+# Example Codex MCP configuration for Autodesk Product Help.
+# Keep this as an example only. Do not store secrets in repository MCP files.
+
+[mcp_servers.autodesk-product-help]
+type = "http"
+url = "https://developer.api.autodesk.com/knowledge/public/v1/mcp"

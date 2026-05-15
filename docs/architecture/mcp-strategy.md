@@ -1,38 +1,115 @@
-# MCP strategy
+# MCP Strategy
 
-## Local MCP
+## Purpose
 
-The template includes a local MCP server that exposes safe Revit tools through stdio and talks to the running Revit add-in through a named pipe.
+This repository supports MCP as a development and runtime integration layer for AI-powered Revit workflows. MCP must remain narrow, deterministic, auditable, and safe for desktop automation.
+
+The strategy covers:
+
+- Autodesk Product Help MCP for documentation research;
+- Revit Public MCP Server / Revit MCP when available;
+- the custom template MCP server in `src/RevitAiTemplate.Mcp.Server`;
+- security policy for MCP tools.
+
+## Autodesk Product Help MCP
+
+Use Autodesk Product Help MCP during development to ground agents in Autodesk documentation before designing Revit API behavior, version-specific differences, or ExternalEvent workflows.
+
+Endpoint:
 
 ```txt
-AI client → MCP stdio → RevitAiTemplate.Mcp.Server → named pipe → Revit add-in → ExternalEvent → Revit API
+https://developer.api.autodesk.com/knowledge/public/v1/mcp
 ```
 
-## Tool categories
+This MCP is a read-oriented documentation source. It must not be treated as a runtime authority for model changes.
 
-### Read-only tools
+Recommended use cases:
 
-- Get active model summary.
-- Count elements by category.
-- Get selected element summaries.
-- Read warnings summary.
+- research Revit API concepts and product documentation;
+- compare documentation across Revit versions;
+- collect citations for implementation plans and ADR drafts;
+- clarify ExternalEvent, transactions, UI, and add-in deployment behavior.
 
-### Write tools
+## Revit Public MCP / Revit MCP
 
-- Set parameter values.
-- Create views/schedules.
-- Rename sheets.
-- Apply standards.
+If a public Autodesk or community Revit MCP server is available, treat it as an external MCP server with unknown permissions until reviewed.
 
-Write tools are disabled by default. They require confirmation, audit logging, and transaction rollback strategy.
+Before enabling it:
 
-## Autodesk MCPs
+- document the server origin and version;
+- inspect tool names, schemas, and permission model;
+- classify each tool as read-only or write;
+- disable or block broad arbitrary execution tools;
+- require human confirmation for every tool that can alter the model;
+- validate that model-touching requests still enter Revit through a valid API context.
 
-Use Autodesk Product Help MCP during development to ground agents in current Autodesk documentation. For Revit 2027, evaluate Autodesk's Revit MCP tech preview, but keep your own plugin tools separately versioned and governed.
+Do not rely on an external Revit MCP server for production behavior without a security review in `docs/security/mcp-security-policy.md`.
 
-## Do not expose
+## Custom Template MCP Server
 
-- Raw arbitrary code execution.
-- Arbitrary transaction execution.
-- Full model export without explicit consent.
-- File system write access unrelated to the task.
+The custom MCP server belongs in `src/RevitAiTemplate.Mcp.Server`. It should expose deterministic tools and communicate with the Revit add-in through the bridge layer.
+
+Runtime flow:
+
+```txt
+AI client -> MCP stdio/http -> RevitAiTemplate.Mcp.Server -> bridge DTOs -> Revit add-in -> ExternalEvent -> Revit API
+```
+
+The external MCP server process must not reference `Autodesk.Revit.*`. Any action that touches the active Revit model must enter the add-in through the bridge and be executed by an `ExternalEvent` handler inside a valid Revit API context.
+
+### Initial Tool Set
+
+Start with read-only tools:
+
+- `get_active_model_summary`
+- `list_categories`
+- `get_selected_elements_summary`
+- `get_element_parameters_summary`
+- `validate_model_rules`
+
+These tools must return structured DTOs and sanitized summaries, not raw Revit API objects.
+
+## Tool Classification
+
+### Read Tools
+
+Read tools may be used for research, inspection, documentation, and validation when they are deterministic and low risk.
+
+Read tools must:
+
+- validate inputs;
+- return structured outputs;
+- avoid full model export by default;
+- sanitize outputs before they are inserted into model prompts;
+- log tool name, input summary, and result summary without secrets.
+
+### Write Tools
+
+Do not implement new write tools in this stage.
+
+When write tools are introduced later, they must:
+
+- require explicit human confirmation;
+- map to specific business commands, not arbitrary Revit API execution;
+- use bridge DTOs and `ExternalEvent`;
+- run model changes inside named Revit `Transaction` boundaries;
+- define rollback or failure compensation behavior;
+- log tool name, input summary, confirmation state, and result summary.
+
+## Forbidden Tool Shapes
+
+Do not expose:
+
+- arbitrary Revit API execution;
+- arbitrary shell command execution;
+- arbitrary transaction execution;
+- unrestricted file system access;
+- full model exports without explicit approval;
+- tools that accept raw prompt text and convert it directly into model writes.
+
+## Related Documents
+
+- `docs/ai/mcp-development-workflow.md`
+- `docs/security/mcp-security-policy.md`
+- `.agents/skills/ai-runtime-mcp-engineer/references/autodesk-mcp.md`
+- `.mcp/revit-public-mcp-notes.md`
