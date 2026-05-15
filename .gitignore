@@ -3,6 +3,7 @@
 bin/
 obj/
 artifacts/
+.worktrees/
 *.user
 *.suo
 *.cache
