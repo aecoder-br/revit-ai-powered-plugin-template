@@ -82,11 +82,13 @@ Choose the smallest tool set that your team will actually use:
 | `copilot` | You use GitHub Copilot prompts under `.github/prompts`. |
 | `multi` | You want all supported adapters available. |
 
-Refresh Claude/Cursor skill mirrors with:
+Run the full AI tooling setup with:
 
 ```powershell
-./scripts/setup-ai-tools.ps1 -Tools All -Mode Copy -Validate
+./scripts/setup-ai-tools.ps1 -Tools All -Mode Copy -Validate -ValidateAdapters
 ```
+
+`All` covers Codex, Claude Code, Cursor, and GitHub Copilot. Claude/Cursor refresh skill mirrors; Codex/Copilot validate static adapters and create missing files only.
 
 ## Using Codex
 
@@ -138,7 +140,7 @@ dotnet new revit-ai-plugin -n MyRevitPlugin --AiTools multi
 Then open the generated `.sln` in Visual Studio and run the relevant setup:
 
 ```powershell
-./scripts/setup-ai-tools.ps1 -Tools All -Mode Copy -Validate
+./scripts/setup-ai-tools.ps1 -Tools All -Mode Copy -Validate -ValidateAdapters
 ```
 
 The native Visual Studio template base is documented in `docs/ai/visual-studio-template.md` and staged from `templates/visualstudio`.

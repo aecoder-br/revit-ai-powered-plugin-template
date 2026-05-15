@@ -59,9 +59,9 @@ Delivery and quality:
 
 ```powershell
 ./scripts/validate-skills.ps1
-./scripts/setup-ai-tools.ps1 -Tools All -Mode Copy -Validate
+./scripts/setup-ai-tools.ps1 -Tools All -Mode Copy -Validate -ValidateAdapters
 ```
 
-3. Review generated mirror diffs in `.claude/skills` and `.cursor/skills`.
+3. Review generated mirror diffs in `.claude/skills` and `.cursor/skills`, plus static adapter validation for Codex and Copilot.
 
 Do not duplicate long skill instructions in README, AGENTS, Claude, Cursor, or Copilot docs.

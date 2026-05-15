@@ -53,17 +53,19 @@ Use `--AiTools` to document the intended AI adapter set:
 After generation, run:
 
 ```powershell
-./scripts/setup-ai-tools.ps1 -Tools All -Mode Copy -Validate
+./scripts/setup-ai-tools.ps1 -Tools All -Mode Copy -Validate -ValidateAdapters
 ```
 
-For a single tool, map the template choice to the setup script where supported:
+For a single tool, map the template choice to the setup script:
 
 ```powershell
+./scripts/setup-ai-tools.ps1 -Tools Codex -ValidateAdapters
 ./scripts/setup-ai-tools.ps1 -Tools Claude -Mode Copy -Validate
 ./scripts/setup-ai-tools.ps1 -Tools Cursor -Mode Copy -Validate
+./scripts/setup-ai-tools.ps1 -Tools Copilot -ValidateAdapters
 ```
 
-Codex and Copilot adapters are repository files and should be reviewed directly after generation.
+Claude and Cursor refresh skill mirrors. Codex and Copilot validate static adapters and create missing files only.
 
 ## Revit Version Choices
 

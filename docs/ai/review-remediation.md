@@ -197,3 +197,51 @@ Results:
 - `validate-ai-adapters.ps1 -Tools All -FailOnWarnings` passed with 84 passed checks, 0 warnings, and 0 failures.
 - `validate-ai-adapters.ps1 -Tools All -VerboseReport` passed and listed canonical skills, Claude mirrors, Cursor mirrors, primary agent adapter references, Codex files, and Copilot prompts.
 - `scripts/check.ps1` now runs adapter parity validation after skill validation. It passed adapter parity validation, then failed at `dotnet test` with `NETSDK1045` because the local environment still lacks .NET SDK 10.0.
+
+## LOW-003: `setup-ai-tools.ps1 -Tools All` could imply every adapter is dynamically refreshed
+
+Status: remediated.
+
+## Problem
+
+The final AI-powered template review found that `scripts/setup-ai-tools.ps1 -Tools All` refreshed Claude and Cursor mirrors, while Codex and GitHub Copilot remained static repository adapters.
+
+This could make users think all four tools were being regenerated dynamically.
+
+## Changes
+
+- `scripts/setup-ai-tools.ps1 -Tools` now accepts `All`, `Codex`, `Claude`, `Cursor`, `Copilot`, and `None`.
+- `-Tools All` now covers all four supported tools explicitly.
+- Claude and Cursor continue to refresh `.claude/skills` and `.cursor/skills` from `.agents/skills`.
+- Codex now has an explicit validation/create branch for `.codex/README.md` and `.codex/config.toml`.
+- Copilot now has an explicit validation/create branch for `.github/copilot-instructions.md` and `.github/prompts`.
+- Added `-ValidateAdapters` to run `scripts/validate-ai-adapters.ps1`.
+- `-Validate` now runs both `scripts/validate-skills.ps1` and `scripts/validate-ai-adapters.ps1`.
+- Setup documentation now distinguishes "refresh mirrors" for Claude/Cursor from "validate static adapters" for Codex/Copilot.
+
+## Validation Notes
+
+Use:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/setup-ai-tools.ps1 -Tools All -Mode Copy -Validate -ValidateAdapters
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/setup-ai-tools.ps1 -Tools Codex,Copilot -ValidateAdapters
+```
+
+## Validation Results
+
+Commands executed:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "<PowerShell parser check for scripts/setup-ai-tools.ps1>"
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/setup-ai-tools.ps1 -Tools All -Mode Copy -Validate -ValidateAdapters
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/setup-ai-tools.ps1 -Tools Codex,Copilot -ValidateAdapters
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/check.ps1
+```
+
+Results:
+
+- PowerShell parser check passed for `scripts/setup-ai-tools.ps1`.
+- `setup-ai-tools.ps1 -Tools All -Mode Copy -Validate -ValidateAdapters` passed. Existing Claude/Cursor mirrors were skipped without `-Force`, Codex/Copilot static adapters were validated, skill validation passed with 60 skills, and adapter parity passed with 84 checks.
+- `setup-ai-tools.ps1 -Tools Codex,Copilot -ValidateAdapters` passed. The script accepts the comma-separated tool list used by `powershell -File`, validated Codex/Copilot static adapters, and adapter parity passed with 32 checks.
+- `scripts/check.ps1` passed skill validation and adapter parity validation, then failed at `dotnet test` with `NETSDK1045` because the local environment still lacks .NET SDK 10.0.
