@@ -72,3 +72,79 @@ CI update:
 
 - No workflow change was required for HIGH-001 because `.github/workflows/ci.yml` already runs `scripts/check.ps1` through `powershell -NoProfile -ExecutionPolicy Bypass -File`.
 - The corrected script exit codes are now sufficient for CI to fail when an executed command fails.
+
+## HIGH-002: validate-diff missed untracked files and committed branch changes
+
+Status: remediated.
+
+## MEDIUM-002: acquire did not enforce task path ownership
+
+Status: remediated.
+
+## Problem
+
+The final AI-powered template review found that `scripts/agent-locks.ps1 validate-diff` validated only tracked working-tree and staged changes. It did not include untracked files and could miss committed branch changes when no base ref was supplied.
+
+The review also found that `scripts/agent-locks.ps1 acquire` checked lock conflicts, but did not reject requested lock paths outside the task's `allowedPaths` or inside `readOnlyPaths`.
+
+## Changes
+
+- `validate-diff` now includes committed branch changes with `git diff --name-only <BaseRef>...HEAD`.
+- `validate-diff` now includes staged changes with `git diff --cached --name-only`.
+- `validate-diff` now includes unstaged tracked changes with `git diff --name-only`.
+- `validate-diff` now includes untracked files with `git ls-files --others --exclude-standard`.
+- `validate-diff` now de-duplicates and normalizes changed paths before validation.
+- `validate-diff` now requires `-BaseRef`, a task `baseRef`, or explicit `-WorkingTreeOnly`.
+- `validate-diff` now fails when a changed file is outside `allowedPaths` or inside `readOnlyPaths`.
+- `acquire` now rejects lock paths outside the task's `allowedPaths`.
+- `acquire` now rejects lock paths that overlap the task's `readOnlyPaths`.
+- `acquire` error messages now include the requested path, `allowedPaths`, `readOnlyPaths`, and conflicting task when applicable.
+
+## Validation Notes
+
+Use branch validation with a base ref:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/agent-locks.ps1 -Command validate-diff -FeatureId <feature-id> -TaskId <task-id> -BaseRef main
+```
+
+Use working-tree-only validation only for pre-commit checks:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/agent-locks.ps1 -Command validate-diff -FeatureId <feature-id> -TaskId <task-id> -WorkingTreeOnly
+```
+
+The final branch/worktree validation gate should not use `-WorkingTreeOnly`.
+
+## Validation Results
+
+Temporary state was created under `.agents/state/manual-lock-test/` and removed after validation. No branch or worktree was created.
+
+Commands executed:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/agent-locks.ps1 -Help
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/agent-locks.ps1 -Command validate-diff -FeatureId manual-lock-test -TaskId task-001 -WorkingTreeOnly
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/agent-locks.ps1 -Command validate-diff -FeatureId manual-lock-test -TaskId task-002 -WorkingTreeOnly
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/agent-locks.ps1 -Command validate-diff -FeatureId manual-lock-test -TaskId task-001 -WorkingTreeOnly
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/agent-locks.ps1 -Command validate-diff -FeatureId manual-lock-test -TaskId task-005
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/agent-locks.ps1 -Command acquire -FeatureId manual-lock-test -TaskId task-001 -Paths scripts/agent-locks.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/agent-locks.ps1 -Command acquire -FeatureId manual-lock-test -TaskId task-003 -Paths README.md
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/agent-locks.ps1 -Command acquire -FeatureId manual-lock-test -TaskId task-004 -Paths scripts/agent-locks.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/validate-skills.ps1 -RootPath . -IncludeMirrors
+powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/check.ps1
+```
+
+Results:
+
+- PowerShell parser check passed for `scripts/agent-locks.ps1`.
+- `validate-diff -WorkingTreeOnly` passed when all current changes were inside `allowedPaths`.
+- `validate-diff -WorkingTreeOnly` failed for tracked changes outside `allowedPaths`.
+- `validate-diff -WorkingTreeOnly` failed for an untracked file outside `allowedPaths`.
+- `validate-diff` without `-BaseRef`, task `baseRef`, or `-WorkingTreeOnly` failed with the expected BaseRef error.
+- `acquire` succeeded for a path inside `allowedPaths`.
+- `acquire` failed for a path overlapping `readOnlyPaths`.
+- `acquire` failed for a lock conflict and reported the conflicting task.
+- `validate-skills.ps1 -IncludeMirrors` passed with 60 validated skills after the lock-script change.
+- `scripts/check.ps1` was run after the lock-script change and failed at `dotnet test` with `NETSDK1045` because the local environment still lacks .NET SDK 10.0. This confirms the corrected check script propagates executed command failures.
+- Temporary test artifacts were removed after validation.

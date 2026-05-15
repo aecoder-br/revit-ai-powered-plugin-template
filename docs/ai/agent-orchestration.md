@@ -78,6 +78,7 @@ The task record includes:
 - `readOnlyPaths`
 - `validationCommands`
 - `handoffPath`
+- optional `baseRef` for branch diff validation
 
 ## Acquire Locks
 
@@ -90,6 +91,8 @@ The task record includes:
 ```
 
 Lock acquisition fails if another active task already owns the same path, a parent path, or a child path.
+
+Lock acquisition also fails when the requested path is outside the task's `allowedPaths` or overlaps `readOnlyPaths`.
 
 List locks:
 
@@ -131,12 +134,32 @@ The command also records the branch and worktree in `tasks.json`.
 ./scripts/agent-locks.ps1 `
   -Command validate-diff `
   -FeatureId mcp-read-tools `
-  -TaskId task-001
+  -TaskId task-001 `
+  -BaseRef main
 ```
 
-The script compares `git diff --name-only` and staged diff names against the task's `allowedPaths`.
+The script validates all changed file sets against the task's `allowedPaths` and `readOnlyPaths`.
 
-The validation fails when any changed file falls outside the allowed paths.
+It includes:
+
+- tracked changes: committed files changed on the task branch via `git diff --name-only <BaseRef>...HEAD`;
+- staged changes: files staged for commit via `git diff --cached --name-only`;
+- unstaged changes: tracked files modified locally via `git diff --name-only`;
+- untracked files: new files not yet tracked via `git ls-files --others --exclude-standard`.
+
+The validation fails when any changed file falls outside `allowedPaths` or inside `readOnlyPaths`.
+
+Use `-WorkingTreeOnly` only for pre-commit local checks when branch history is intentionally out of scope:
+
+```powershell
+./scripts/agent-locks.ps1 `
+  -Command validate-diff `
+  -FeatureId mcp-read-tools `
+  -TaskId task-001 `
+  -WorkingTreeOnly
+```
+
+Final branch/worktree validation should use `-BaseRef` or a task state `baseRef`.
 
 ## Complete a Task
 
@@ -180,7 +203,7 @@ Use:
 ```powershell
 ./scripts/agent-feature.ps1 -Command validate -FeatureId <feature-id>
 ./scripts/agent-worktree.ps1 -Command validate -FeatureId <feature-id>
-./scripts/agent-locks.ps1 -Command validate-diff -FeatureId <feature-id> -TaskId <task-id>
+./scripts/agent-locks.ps1 -Command validate-diff -FeatureId <feature-id> -TaskId <task-id> -BaseRef main
 ```
 
 Repository-level validation remains:

@@ -5,6 +5,7 @@ param(
   [string]$TaskId,
   [string[]]$Paths = @(),
   [string]$BaseRef,
+  [switch]$WorkingTreeOnly,
   [switch]$Help
 )
 
@@ -24,7 +25,8 @@ Examples:
   ./scripts/agent-locks.ps1 -Command list -FeatureId mcp-read-tools
   ./scripts/agent-locks.ps1 -Command acquire -FeatureId mcp-read-tools -TaskId task-001 -Paths docs/features/mcp-read-tools
   ./scripts/agent-locks.ps1 -Command release -FeatureId mcp-read-tools -TaskId task-001 -Paths docs/features/mcp-read-tools
-  ./scripts/agent-locks.ps1 -Command validate-diff -FeatureId mcp-read-tools -TaskId task-001
+  ./scripts/agent-locks.ps1 -Command validate-diff -FeatureId mcp-read-tools -TaskId task-001 -BaseRef main
+  ./scripts/agent-locks.ps1 -Command validate-diff -FeatureId mcp-read-tools -TaskId task-001 -WorkingTreeOnly
 '@
 }
 
@@ -58,6 +60,87 @@ function Test-PathConflict {
   $b = ConvertTo-RepoPath -Path $Right
 
   return ($a -eq $b -or $a.StartsWith("$b/") -or $b.StartsWith("$a/"))
+}
+
+function Test-PathInside {
+  param([string]$Path, [string]$OwnerPath)
+
+  $normalizedPath = ConvertTo-RepoPath -Path $Path
+  $normalizedOwnerPath = ConvertTo-RepoPath -Path $OwnerPath
+
+  return ($normalizedPath -eq $normalizedOwnerPath -or $normalizedPath.StartsWith("$normalizedOwnerPath/"))
+}
+
+function Test-PathInsideAny {
+  param([string]$Path, [string[]]$OwnerPaths)
+
+  foreach ($ownerPath in $OwnerPaths) {
+    if (Test-PathInside -Path $Path -OwnerPath $ownerPath) {
+      return $true
+    }
+  }
+
+  return $false
+}
+
+function Test-PathOverlapsAny {
+  param([string]$Path, [string[]]$OwnerPaths)
+
+  foreach ($ownerPath in $OwnerPaths) {
+    if (Test-PathConflict -Left $Path -Right $ownerPath) {
+      return $true
+    }
+  }
+
+  return $false
+}
+
+function Format-PathList {
+  param([string[]]$Values)
+
+  if ($Values.Count -eq 0) {
+    return '<none>'
+  }
+
+  return ($Values -join ', ')
+}
+
+function Get-TaskPathSet {
+  param([object]$Task, [string]$PropertyName)
+
+  if (-not ($Task.PSObject.Properties.Name -contains $PropertyName)) {
+    return @()
+  }
+
+  return @($Task.$PropertyName | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { ConvertTo-RepoPath -Path $_ })
+}
+
+function Get-TaskBaseRef {
+  param([object]$Task)
+
+  foreach ($propertyName in @('baseRef','branchBaseRef')) {
+    if (($Task.PSObject.Properties.Name -contains $propertyName) -and -not [string]::IsNullOrWhiteSpace($Task.$propertyName)) {
+      return $Task.$propertyName
+    }
+  }
+
+  return $null
+}
+
+function Invoke-GitNameList {
+  param(
+    [string]$Root,
+    [string[]]$Arguments,
+    [string]$Description
+  )
+
+  $safeRoot = (ConvertTo-RepoPath -Path $Root)
+  $output = @(& git -c "safe.directory=$safeRoot" -C $Root @Arguments)
+  if ($LASTEXITCODE -ne 0) {
+    throw "$Description failed with exit code $LASTEXITCODE."
+  }
+
+  return @($output | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | ForEach-Object { ConvertTo-RepoPath -Path $_ })
 }
 
 function Get-StatePaths {
@@ -141,15 +224,29 @@ function Invoke-Acquire {
     throw "Cannot acquire locks for inactive task '$TaskId' with status '$($task.status)'."
   }
 
+  $allowedPaths = Get-TaskPathSet -Task $task -PropertyName 'allowedPaths'
+  $readOnlyPaths = Get-TaskPathSet -Task $task -PropertyName 'readOnlyPaths'
+  if ($allowedPaths.Count -eq 0) {
+    throw "Task '$TaskId' has no allowedPaths. Requested paths: $(Format-PathList -Values @($Paths | ForEach-Object { ConvertTo-RepoPath -Path $_ }))."
+  }
+
   $data = Get-LocksData -LocksFile $state.LocksFile
   $locks = @($data.locks)
   $now = (Get-Date).ToUniversalTime().ToString('o')
 
   foreach ($requestedPath in $Paths) {
     $normalized = ConvertTo-RepoPath -Path $requestedPath
+    if (-not (Test-PathInsideAny -Path $normalized -OwnerPaths $allowedPaths)) {
+      throw "Requested lock path '$normalized' is outside allowedPaths for task '$TaskId'. allowedPaths: $(Format-PathList -Values $allowedPaths). readOnlyPaths: $(Format-PathList -Values $readOnlyPaths)."
+    }
+
+    if (Test-PathOverlapsAny -Path $normalized -OwnerPaths $readOnlyPaths) {
+      throw "Requested lock path '$normalized' overlaps readOnlyPaths for task '$TaskId'. allowedPaths: $(Format-PathList -Values $allowedPaths). readOnlyPaths: $(Format-PathList -Values $readOnlyPaths)."
+    }
+
     foreach ($lock in $locks) {
       if ($lock.taskId -ne $TaskId -and (Test-PathConflict -Left $normalized -Right $lock.path)) {
-        throw "Path '$normalized' conflicts with lock '$($lock.path)' held by task '$($lock.taskId)'."
+        throw "Requested lock path '$normalized' conflicts with lock '$($lock.path)' held by task '$($lock.taskId)'. allowedPaths: $(Format-PathList -Values $allowedPaths). readOnlyPaths: $(Format-PathList -Values $readOnlyPaths)."
       }
     }
   }
@@ -204,44 +301,58 @@ function Invoke-ValidateDiff {
     throw "Task does not exist: $TaskId"
   }
 
-  $allowedPaths = @($task.allowedPaths | ForEach-Object { ConvertTo-RepoPath -Path $_ })
+  $allowedPaths = Get-TaskPathSet -Task $task -PropertyName 'allowedPaths'
+  $readOnlyPaths = Get-TaskPathSet -Task $task -PropertyName 'readOnlyPaths'
   if ($allowedPaths.Count -eq 0) {
     throw "Task '$TaskId' has no allowedPaths."
   }
 
-  $diffArgs = @('-C', $Root, 'diff', '--name-only')
-  if (-not [string]::IsNullOrWhiteSpace($BaseRef)) {
-    $diffArgs += $BaseRef
+  $effectiveBaseRef = $BaseRef
+  if ([string]::IsNullOrWhiteSpace($effectiveBaseRef)) {
+    $effectiveBaseRef = Get-TaskBaseRef -Task $task
   }
 
-  $changed = @(& git @diffArgs)
-  $staged = @(& git -C $Root diff --cached --name-only)
-  $changed = @($changed + $staged | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Sort-Object -Unique)
+  if (-not $WorkingTreeOnly -and [string]::IsNullOrWhiteSpace($effectiveBaseRef)) {
+    throw "validate-diff requires -BaseRef or task baseRef unless -WorkingTreeOnly is specified. Task: $TaskId."
+  }
+
+  $changed = @()
+  if (-not $WorkingTreeOnly) {
+    $changed += Invoke-GitNameList -Root $Root -Arguments @('diff', '--name-only', "$effectiveBaseRef...HEAD") -Description "Committed branch diff from '$effectiveBaseRef' to HEAD"
+  }
+
+  $changed += Invoke-GitNameList -Root $Root -Arguments @('diff', '--cached', '--name-only') -Description 'Staged diff'
+  $changed += Invoke-GitNameList -Root $Root -Arguments @('diff', '--name-only') -Description 'Unstaged diff'
+  $changed += Invoke-GitNameList -Root $Root -Arguments @('ls-files', '--others', '--exclude-standard') -Description 'Untracked file scan'
+  $changed = @($changed | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Sort-Object -Unique)
 
   if ($changed.Count -eq 0) {
-    Write-Host 'No changed files found by git diff.' -ForegroundColor Cyan
+    Write-Host 'No changed files found by git diff or untracked file scan.' -ForegroundColor Cyan
     return
   }
 
   $outside = New-Object System.Collections.Generic.List[string]
+  $readOnlyViolations = New-Object System.Collections.Generic.List[string]
   foreach ($file in $changed) {
     $normalizedFile = ConvertTo-RepoPath -Path $file
-    $inside = $false
-    foreach ($allowed in $allowedPaths) {
-      if ($normalizedFile -eq $allowed -or $normalizedFile.StartsWith("$allowed/")) {
-        $inside = $true
-        break
-      }
-    }
-    if (-not $inside) {
+    if (-not (Test-PathInsideAny -Path $normalizedFile -OwnerPaths $allowedPaths)) {
       $outside.Add($normalizedFile) | Out-Null
+    }
+
+    if (Test-PathInsideAny -Path $normalizedFile -OwnerPaths $readOnlyPaths) {
+      $readOnlyViolations.Add($normalizedFile) | Out-Null
     }
   }
 
-  if ($outside.Count -gt 0) {
+  if ($outside.Count -gt 0 -or $readOnlyViolations.Count -gt 0) {
     Write-Host "Diff validation failed for task: $TaskId" -ForegroundColor Red
+    Write-Host "  allowedPaths: $(Format-PathList -Values $allowedPaths)" -ForegroundColor Red
+    Write-Host "  readOnlyPaths: $(Format-PathList -Values $readOnlyPaths)" -ForegroundColor Red
     foreach ($file in $outside) {
       Write-Host "  OUTSIDE $file" -ForegroundColor Red
+    }
+    foreach ($file in $readOnlyViolations) {
+      Write-Host "  READONLY $file" -ForegroundColor Red
     }
     exit 1
   }
