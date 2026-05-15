@@ -1,0 +1,67 @@
+name: template-pack
+
+on:
+  pull_request:
+    paths:
+      - 'templates/**'
+      - 'scripts/pack-dotnet-template.ps1'
+      - 'scripts/pack-vs-template.ps1'
+      - '.github/workflows/template-pack.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'templates/**'
+      - 'scripts/pack-dotnet-template.ps1'
+      - 'scripts/pack-vs-template.ps1'
+      - '.github/workflows/template-pack.yml'
+
+jobs:
+  validate-templates:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8.x
+            10.x
+
+      - name: Validate dotnet template JSON
+        shell: pwsh
+        run: |
+          $templatePath = Join-Path $env:GITHUB_WORKSPACE 'templates/dotnet/RevitAiPlugin/.template.config/template.json'
+          $template = Get-Content -Raw -LiteralPath $templatePath | ConvertFrom-Json
+          if ($template.shortName -ne 'revit-ai-plugin') {
+            throw 'dotnet template shortName must be revit-ai-plugin.'
+          }
+          foreach ($symbol in @('CompanyName', 'ProductName', 'RootNamespace', 'VendorId', 'RevitVersions', 'AiTools')) {
+            if (-not $template.symbols.$symbol) {
+              throw "dotnet template missing symbol: $symbol"
+            }
+          }
+
+      - name: Pack dotnet template staging
+        shell: pwsh
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/pack-dotnet-template.ps1 -Force
+
+      - name: Validate Visual Studio template XML
+        shell: pwsh
+        run: |
+          $templatePath = Join-Path $env:GITHUB_WORKSPACE 'templates/visualstudio/RevitAiPlugin.ProjectGroup.vstemplate'
+          [xml]$xml = Get-Content -Raw -LiteralPath $templatePath
+          $namespaceManager = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
+          $namespaceManager.AddNamespace('vs', 'http://schemas.microsoft.com/developer/vstemplate/2005')
+          $root = $xml.SelectSingleNode('/vs:VSTemplate', $namespaceManager)
+          if ($null -eq $root -or $root.Type -ne 'ProjectGroup') {
+            throw 'Root Visual Studio template must be Type="ProjectGroup".'
+          }
+          $links = $xml.SelectNodes('//vs:ProjectTemplateLink', $namespaceManager)
+          if ($links.Count -lt 9) {
+            throw 'Visual Studio ProjectGroup should declare the planned project links.'
+          }
+
+      - name: Pack Visual Studio template staging
+        shell: pwsh
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/pack-vs-template.ps1 -Force

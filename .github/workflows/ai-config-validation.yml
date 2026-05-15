@@ -4,17 +4,96 @@ on:
   pull_request:
     paths:
       - '.agents/**'
-      - '.claude/skills/**'
-      - '.cursor/skills/**'
-      - 'docs/ai/skill-validation.md'
+      - '.claude/**'
+      - '.cursor/**'
+      - '.codex/**'
+      - '.github/prompts/**'
+      - '.github/copilot-instructions.md'
+      - 'docs/ai/**'
+      - 'docs/security/mcp-security-policy.md'
+      - 'scripts/validate-skills.ps1'
+      - '.github/workflows/ai-config-validation.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - '.agents/**'
+      - '.claude/**'
+      - '.cursor/**'
+      - '.codex/**'
+      - '.github/prompts/**'
+      - '.github/copilot-instructions.md'
+      - 'docs/ai/**'
+      - 'docs/security/mcp-security-policy.md'
       - 'scripts/validate-skills.ps1'
       - '.github/workflows/ai-config-validation.yml'
 
 jobs:
-  validate-agent-skills:
+  validate-ai-config:
     runs-on: windows-latest
+
     steps:
       - uses: actions/checkout@v4
-      - name: Validate agent skills
-        shell: powershell
+
+      - name: Validate agent skills and mirrors
+        shell: pwsh
         run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/validate-skills.ps1 -RootPath $env:GITHUB_WORKSPACE -IncludeMirrors
+
+      - name: Validate roster JSON
+        shell: pwsh
+        run: |
+          $rosterPath = Join-Path $env:GITHUB_WORKSPACE '.agents/roster.json'
+          $roster = Get-Content -Raw -LiteralPath $rosterPath | ConvertFrom-Json
+          if (-not $roster.roles -or $roster.roles.Count -eq 0) {
+            throw 'Roster must contain at least one role.'
+          }
+          foreach ($role in $roster.roles) {
+            if ([string]::IsNullOrWhiteSpace($role.name)) {
+              throw 'Roster role missing name.'
+            }
+            if ($role.name -notmatch '^[a-z0-9]+(-[a-z0-9]+)*$') {
+              throw "Roster role name is not lowercase-kebab-case: $($role.name)"
+            }
+          }
+
+      - name: Validate Codex config text
+        shell: pwsh
+        run: |
+          $codexPath = Join-Path $env:GITHUB_WORKSPACE '.codex/config.toml'
+          if (-not (Test-Path -LiteralPath $codexPath)) {
+            Write-Host 'No .codex/config.toml found; skipping Codex config validation.'
+            return
+          }
+          $lines = Get-Content -LiteralPath $codexPath
+          $lineNumber = 0
+          foreach ($line in $lines) {
+            $lineNumber++
+            $trimmed = $line.Trim()
+            if ([string]::IsNullOrWhiteSpace($trimmed) -or $trimmed.StartsWith('#')) {
+              continue
+            }
+            $isSection = $trimmed -match '^\[[A-Za-z0-9_.-]+(\.[A-Za-z0-9_.-]+)*\]$'
+            $isAssignment = $trimmed -match '^[A-Za-z0-9_.-]+\s*=\s*.+$'
+            if (-not ($isSection -or $isAssignment)) {
+              throw "Basic TOML syntax check failed at .codex/config.toml:$lineNumber"
+            }
+          }
+
+      - name: Validate prompt files
+        shell: pwsh
+        run: |
+          $promptRoot = Join-Path $env:GITHUB_WORKSPACE '.github/prompts'
+          if (-not (Test-Path -LiteralPath $promptRoot)) {
+            throw 'Prompt directory missing: .github/prompts'
+          }
+          $prompts = @(Get-ChildItem -LiteralPath $promptRoot -Filter '*.prompt.md' -File)
+          if ($prompts.Count -eq 0) {
+            throw 'No .prompt.md files found.'
+          }
+          foreach ($prompt in $prompts) {
+            $text = Get-Content -Raw -LiteralPath $prompt.FullName
+            foreach ($required in @('name:', 'description:', 'agent:', 'AGENTS.md', '.agents/workflows', '.agents/skills')) {
+              if ($text -notmatch [regex]::Escape($required)) {
+                throw "$($prompt.Name) missing required prompt marker: $required"
+              }
+            }
+          }

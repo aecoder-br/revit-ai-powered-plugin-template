@@ -6,19 +6,58 @@ on:
     branches: [ main ]
 
 jobs:
-  build-shared:
+  validate-without-revit:
+    name: Validate without Revit
     runs-on: windows-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: |
             8.x
             10.x
-      - name: Restore
-        run: dotnet restore tests/RevitAiTemplate.Application.Tests/RevitAiTemplate.Application.Tests.csproj
-      - name: Test shared projects
-        run: dotnet test tests/RevitAiTemplate.Application.Tests/RevitAiTemplate.Application.Tests.csproj -c Release
 
-  # Full Revit add-in builds require Revit API DLLs on the runner.
-  # Use a self-hosted Windows runner with Revit installed for production CI.
+      - name: Report Revit availability
+        shell: pwsh
+        run: |
+          $versions = @('2024', '2025', '2026', '2027')
+          foreach ($version in $versions) {
+            $path = "C:\Program Files\Autodesk\Revit $version"
+            if (Test-Path -LiteralPath $path) {
+              Write-Host "Revit $version found at $path"
+            } else {
+              Write-Host "Revit $version not found. Version-specific Revit build will be skipped on this hosted runner."
+            }
+          }
+
+      - name: Validate agent skills
+        shell: pwsh
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/validate-skills.ps1 -RootPath $env:GITHUB_WORKSPACE -IncludeMirrors
+
+      - name: Restore shared tests
+        shell: pwsh
+        run: dotnet restore tests/RevitAiTemplate.Application.Tests/RevitAiTemplate.Application.Tests.csproj
+
+      - name: Test shared projects
+        shell: pwsh
+        run: dotnet test tests/RevitAiTemplate.Application.Tests/RevitAiTemplate.Application.Tests.csproj -c Release --no-restore
+
+      - name: Build AI Gateway
+        shell: pwsh
+        run: dotnet build src/RevitAiTemplate.AiGateway/RevitAiTemplate.AiGateway.csproj -c Release
+
+      - name: Build MCP Server
+        shell: pwsh
+        run: dotnet build src/RevitAiTemplate.Mcp.Server/RevitAiTemplate.Mcp.Server.csproj -c Release
+
+      - name: Run repository check script
+        shell: pwsh
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check.ps1 -Configuration Release
+
+      - name: Revit full-build note
+        shell: pwsh
+        run: |
+          Write-Host "Full Revit add-in builds require Autodesk Revit API DLLs."
+          Write-Host "Use a self-hosted Windows runner with the required Revit versions installed for production release validation."
