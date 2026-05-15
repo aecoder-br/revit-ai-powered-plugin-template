@@ -1,0 +1,89 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{57A17272-0AE7-49F9-96F6-21665CC2F9F8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{E51D6492-C42B-4DFB-B190-B8F56271A23A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{AB1BFB74-60DA-4D12-B6BF-96A83FC5E5E4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitAiTemplate.Core", "src\RevitAiTemplate.Core\RevitAiTemplate.Core.csproj", "{5FE835D2-9E71-4940-BFD7-1003EF3F4198}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitAiTemplate.Application", "src\RevitAiTemplate.Application\RevitAiTemplate.Application.csproj", "{02C188B8-6B8D-4329-899B-FDBB25348DAB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitAiTemplate.Infrastructure", "src\RevitAiTemplate.Infrastructure\RevitAiTemplate.Infrastructure.csproj", "{0C37D044-23B0-49B7-8C00-7E24B8F758A5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitAiTemplate.Ui.Wpf", "src\RevitAiTemplate.Ui.Wpf\RevitAiTemplate.Ui.Wpf.csproj", "{07161E98-D6E1-4EBC-A8BA-E7DC1D063268}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitAiTemplate.RevitBridge", "src\RevitAiTemplate.RevitBridge\RevitAiTemplate.RevitBridge.csproj", "{26C2A1E2-D4F2-4E96-A406-63494E6DF94B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitAiTemplate.Revit", "src\RevitAiTemplate.Revit\RevitAiTemplate.Revit.csproj", "{09AA052B-1843-4B1F-8E30-CE249F0B6F2B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitAiTemplate.Mcp.Server", "src\RevitAiTemplate.Mcp.Server\RevitAiTemplate.Mcp.Server.csproj", "{B49E227F-63B0-4C68-A7E5-16478E3F28BC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitAiTemplate.AiGateway", "src\RevitAiTemplate.AiGateway\RevitAiTemplate.AiGateway.csproj", "{C4DBBD5A-09F9-4C54-9C2C-6DE3EE1A87F8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RevitAiTemplate.Application.Tests", "tests\RevitAiTemplate.Application.Tests\RevitAiTemplate.Application.Tests.csproj", "{8C4F2EBD-381D-44C7-A2D6-EFEF4D14BA6D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5FE835D2-9E71-4940-BFD7-1003EF3F4198}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FE835D2-9E71-4940-BFD7-1003EF3F4198}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FE835D2-9E71-4940-BFD7-1003EF3F4198}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FE835D2-9E71-4940-BFD7-1003EF3F4198}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02C188B8-6B8D-4329-899B-FDBB25348DAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02C188B8-6B8D-4329-899B-FDBB25348DAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02C188B8-6B8D-4329-899B-FDBB25348DAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02C188B8-6B8D-4329-899B-FDBB25348DAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C37D044-23B0-49B7-8C00-7E24B8F758A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C37D044-23B0-49B7-8C00-7E24B8F758A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C37D044-23B0-49B7-8C00-7E24B8F758A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C37D044-23B0-49B7-8C00-7E24B8F758A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07161E98-D6E1-4EBC-A8BA-E7DC1D063268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07161E98-D6E1-4EBC-A8BA-E7DC1D063268}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07161E98-D6E1-4EBC-A8BA-E7DC1D063268}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07161E98-D6E1-4EBC-A8BA-E7DC1D063268}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26C2A1E2-D4F2-4E96-A406-63494E6DF94B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26C2A1E2-D4F2-4E96-A406-63494E6DF94B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26C2A1E2-D4F2-4E96-A406-63494E6DF94B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26C2A1E2-D4F2-4E96-A406-63494E6DF94B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09AA052B-1843-4B1F-8E30-CE249F0B6F2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09AA052B-1843-4B1F-8E30-CE249F0B6F2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09AA052B-1843-4B1F-8E30-CE249F0B6F2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09AA052B-1843-4B1F-8E30-CE249F0B6F2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B49E227F-63B0-4C68-A7E5-16478E3F28BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B49E227F-63B0-4C68-A7E5-16478E3F28BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B49E227F-63B0-4C68-A7E5-16478E3F28BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B49E227F-63B0-4C68-A7E5-16478E3F28BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4DBBD5A-09F9-4C54-9C2C-6DE3EE1A87F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4DBBD5A-09F9-4C54-9C2C-6DE3EE1A87F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4DBBD5A-09F9-4C54-9C2C-6DE3EE1A87F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4DBBD5A-09F9-4C54-9C2C-6DE3EE1A87F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C4F2EBD-381D-44C7-A2D6-EFEF4D14BA6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C4F2EBD-381D-44C7-A2D6-EFEF4D14BA6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C4F2EBD-381D-44C7-A2D6-EFEF4D14BA6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C4F2EBD-381D-44C7-A2D6-EFEF4D14BA6D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5FE835D2-9E71-4940-BFD7-1003EF3F4198} = {57A17272-0AE7-49F9-96F6-21665CC2F9F8}
+		{02C188B8-6B8D-4329-899B-FDBB25348DAB} = {57A17272-0AE7-49F9-96F6-21665CC2F9F8}
+		{0C37D044-23B0-49B7-8C00-7E24B8F758A5} = {57A17272-0AE7-49F9-96F6-21665CC2F9F8}
+		{07161E98-D6E1-4EBC-A8BA-E7DC1D063268} = {57A17272-0AE7-49F9-96F6-21665CC2F9F8}
+		{26C2A1E2-D4F2-4E96-A406-63494E6DF94B} = {57A17272-0AE7-49F9-96F6-21665CC2F9F8}
+		{09AA052B-1843-4B1F-8E30-CE249F0B6F2B} = {57A17272-0AE7-49F9-96F6-21665CC2F9F8}
+		{B49E227F-63B0-4C68-A7E5-16478E3F28BC} = {E51D6492-C42B-4DFB-B190-B8F56271A23A}
+		{C4DBBD5A-09F9-4C54-9C2C-6DE3EE1A87F8} = {E51D6492-C42B-4DFB-B190-B8F56271A23A}
+		{8C4F2EBD-381D-44C7-A2D6-EFEF4D14BA6D} = {AB1BFB74-60DA-4D12-B6BF-96A83FC5E5E4}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {767F155E-95D6-4F9C-96D5-7AC4BA1B0D78}
+	EndGlobalSection
+EndGlobal

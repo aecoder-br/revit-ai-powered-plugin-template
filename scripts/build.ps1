@@ -13,7 +13,7 @@ $versions = if ($RevitVersion -eq 'all') { @('2024','2025','2026','2027') } else
 foreach ($v in $versions) {
   $installDir = "C:\Program Files\Autodesk\Revit $v"
   if (-not (Test-Path $installDir)) {
-    Write-Warning "Skipping Revit $v: $installDir not found."
+    Write-Warning "Skipping Revit ${v}: $installDir not found."
     continue
   }
 

@@ -35,6 +35,27 @@ Do not use a single binary for all versions. Generate one binary per version and
 - .NET SDK 10 for Revit 2027, MCP server, and AI Gateway.
 - .NET Framework 4.8 Developer Pack for Revit 2024.
 
+## Opening in Visual Studio
+
+Open `RevitAiTemplate.sln` from the repository root in Visual Studio 2022 or later.
+
+The solution groups projects into:
+
+- `src`: shared domain/application/infrastructure/UI/bridge projects and the Revit add-in host.
+- `tools`: the local MCP server and AI Gateway.
+- `tests`: application test projects.
+
+Use the solution for navigation, editing, tests, and shared project builds. For Revit add-in binaries, prefer the version-aware PowerShell scripts so the correct Revit API references, target framework, constants, and output folder are selected:
+
+```powershell
+./scripts/build.ps1 -RevitVersion 2024
+./scripts/build.ps1 -RevitVersion 2025
+./scripts/build.ps1 -RevitVersion 2026
+./scripts/build.ps1 -RevitVersion 2027
+```
+
+If a Revit version is not installed, the build script skips that version and reports the missing install folder.
+
 ## Build
 
 ```powershell
