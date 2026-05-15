@@ -94,6 +94,8 @@ Codex should read `AGENTS.md`, `.agents/skills`, `.agents/workflows`, and `.code
 
 Use repository skills for planning, Revit API review, MCP design, QA, and PR review. Keep permissions restricted and require confirmation before destructive commands, worktree deletion, model writes, or external setup.
 
+For a documentation-only example of the agent workflow, see `docs/features/example-analyze-active-model/`. It demonstrates a safe read-only feature plan, path ownership, and handoffs without creating branches or worktrees.
+
 ## Using Claude Code
 
 Claude Code should use `CLAUDE.md`, `AGENTS.md`, `.claude/agents`, and `.claude/skills`.

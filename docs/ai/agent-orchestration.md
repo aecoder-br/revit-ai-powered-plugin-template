@@ -188,3 +188,16 @@ Repository-level validation remains:
 ```powershell
 ./scripts/check.ps1
 ```
+
+## Documented Example
+
+See `docs/features/example-analyze-active-model/` for a documentation-only feature example: "Analyze active model and summarize categories using AI Gateway."
+
+The example includes:
+
+- a product brief, requirements, and acceptance criteria;
+- a `task-plan.json` with `allowedPaths`, `readOnlyPaths`, validation commands, and handoff paths;
+- role handoffs for product, requirements, Revit API review, QA, security, and PR review;
+- a safe read-only Revit workflow that does not create real branches, worktrees, locks, or production code changes.
+
+Use it as a reference for path ownership: each planned task owns a narrow write surface, and reviewers can reject any diff outside the task's `allowedPaths`.

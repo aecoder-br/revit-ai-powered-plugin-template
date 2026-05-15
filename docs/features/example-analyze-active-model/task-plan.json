@@ -1,0 +1,140 @@
+{
+  "featureId": "example-analyze-active-model",
+  "title": "Analyze active model and summarize categories using AI Gateway",
+  "status": "example-only",
+  "createsBranches": false,
+  "createsWorktrees": false,
+  "notes": [
+    "This is a documented example only.",
+    "Do not create real branches, locks, or worktrees from this file.",
+    "Use allowedPaths to prevent concurrent agents from editing the same files."
+  ],
+  "tasks": [
+    {
+      "id": "task-001-docs-only",
+      "title": "Create example feature documentation",
+      "assignedRole": "technical-writer",
+      "skill": "technical-writer",
+      "branch": "ai/example-analyze-active-model/task-001-technical-writer",
+      "worktreePath": ".worktrees/example-analyze-active-model/task-001",
+      "status": "planned-example",
+      "allowedPaths": [
+        "docs/features/example-analyze-active-model/"
+      ],
+      "readOnlyPaths": [
+        ".agents/workflows/",
+        ".agents/skills/",
+        "AGENTS.md",
+        "README.md"
+      ],
+      "validationCommands": [
+        "powershell -NoProfile -ExecutionPolicy Bypass -Command \"Get-Content -Raw docs/features/example-analyze-active-model/task-plan.json | ConvertFrom-Json | Out-Null\"",
+        "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check.ps1"
+      ],
+      "handoffPath": "docs/features/example-analyze-active-model/handoffs/product-manager.md"
+    },
+    {
+      "id": "task-002-application-tests",
+      "title": "Plan application-level tests for category summary DTOs",
+      "assignedRole": "qa-automation-engineer",
+      "skill": "qa-automation-engineer",
+      "branch": "ai/example-analyze-active-model/task-002-qa-automation-engineer",
+      "worktreePath": ".worktrees/example-analyze-active-model/task-002",
+      "status": "planned-example",
+      "allowedPaths": [
+        "tests/RevitAiTemplate.Application.Tests/",
+        "docs/features/example-analyze-active-model/handoffs/qa-automation-engineer.md"
+      ],
+      "readOnlyPaths": [
+        "src/RevitAiTemplate.Core/",
+        "src/RevitAiTemplate.Application/",
+        "src/RevitAiTemplate.RevitBridge/"
+      ],
+      "validationCommands": [
+        "dotnet test tests/RevitAiTemplate.Application.Tests/RevitAiTemplate.Application.Tests.csproj -c Release",
+        "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check.ps1"
+      ],
+      "handoffPath": "docs/features/example-analyze-active-model/handoffs/qa-automation-engineer.md"
+    },
+    {
+      "id": "task-003-revit-api-review",
+      "title": "Review Revit API context and ExternalEvent requirements",
+      "assignedRole": "revit-api-senior",
+      "skill": "revit-api-senior",
+      "branch": "ai/example-analyze-active-model/task-003-revit-api-senior",
+      "worktreePath": ".worktrees/example-analyze-active-model/task-003",
+      "status": "planned-example",
+      "allowedPaths": [
+        "docs/features/example-analyze-active-model/handoffs/revit-api-senior.md"
+      ],
+      "readOnlyPaths": [
+        "src/RevitAiTemplate.Revit/",
+        "src/RevitAiTemplate.RevitBridge/",
+        "src/RevitAiTemplate.Ui.Wpf/",
+        "AGENTS.md"
+      ],
+      "validationCommands": [
+        "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -RevitVersion 2024",
+        "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -RevitVersion 2025",
+        "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -RevitVersion 2026",
+        "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build.ps1 -RevitVersion 2027"
+      ],
+      "handoffPath": "docs/features/example-analyze-active-model/handoffs/revit-api-senior.md"
+    },
+    {
+      "id": "task-004-ai-gateway-review",
+      "title": "Review AI Gateway request minimization and provider boundary",
+      "assignedRole": "ai-gateway-backend-engineer",
+      "skill": "ai-gateway-backend-engineer",
+      "branch": "ai/example-analyze-active-model/task-004-ai-gateway-backend-engineer",
+      "worktreePath": ".worktrees/example-analyze-active-model/task-004",
+      "status": "planned-example",
+      "allowedPaths": [
+        "docs/features/example-analyze-active-model/handoffs/cybersecurity-privacy-engineer.md"
+      ],
+      "readOnlyPaths": [
+        "src/RevitAiTemplate.AiGateway/",
+        "src/RevitAiTemplate.Infrastructure/",
+        "docs/security/"
+      ],
+      "validationCommands": [
+        "dotnet build src/RevitAiTemplate.AiGateway/RevitAiTemplate.AiGateway.csproj -c Release",
+        "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check.ps1"
+      ],
+      "handoffPath": "docs/features/example-analyze-active-model/handoffs/cybersecurity-privacy-engineer.md"
+    },
+    {
+      "id": "task-005-qa-validation",
+      "title": "Validate final diff boundaries and documentation completeness",
+      "assignedRole": "verifier",
+      "skill": "verifier",
+      "branch": "ai/example-analyze-active-model/task-005-verifier",
+      "worktreePath": ".worktrees/example-analyze-active-model/task-005",
+      "status": "planned-example",
+      "allowedPaths": [
+        "docs/features/example-analyze-active-model/",
+        "docs/ai/agent-orchestration.md",
+        "README.md"
+      ],
+      "readOnlyPaths": [
+        ".agents/workflows/",
+        ".agents/skills/",
+        ".github/workflows/",
+        "scripts/"
+      ],
+      "validationCommands": [
+        "powershell -NoProfile -ExecutionPolicy Bypass -Command \"Get-Content -Raw docs/features/example-analyze-active-model/task-plan.json | ConvertFrom-Json | Out-Null\"",
+        "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/validate-skills.ps1 -IncludeMirrors",
+        "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check.ps1"
+      ],
+      "handoffPath": "docs/features/example-analyze-active-model/handoffs/pr-reviewer.md"
+    }
+  ],
+  "mergeOrder": [
+    "task-001-docs-only",
+    "task-002-application-tests",
+    "task-003-revit-api-review",
+    "task-004-ai-gateway-review",
+    "task-005-qa-validation"
+  ]
+}
