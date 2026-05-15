@@ -1,0 +1,24 @@
+---
+name: product-requirements
+description: Convert a product brief or vague request into actionable Revit plugin requirements.
+agent: plan
+argument-hint: <feature brief, request, or feature-id>
+---
+
+# Product Requirements
+
+Use `AGENTS.md` as the repository rule source.
+Use `.agents/skills/product-manager/SKILL.md` and `.agents/skills/requirements-analyst/SKILL.md`.
+Follow `.agents/workflows/feature-lifecycle.md` and `.agents/workflows/handoff-contract.md`.
+
+Do not implement code.
+
+Produce or update:
+
+- `docs/features/<feature-id>/brief.md`
+- `docs/features/<feature-id>/requirements.md`
+- `docs/features/<feature-id>/acceptance-criteria.md`
+- `docs/features/<feature-id>/non-functional-requirements.md`
+- `docs/features/<feature-id>/ai-data-policy.md`
+
+Capture assumptions instead of inventing missing requirements. Include Revit workflow context, version matrix, security/privacy requirements, UX constraints, and test requirements.

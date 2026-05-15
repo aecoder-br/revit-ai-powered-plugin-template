@@ -5,10 +5,13 @@ Use `AGENTS.md` as the canonical source of repository rules.
 Use `.github/prompts/*.prompt.md` for repeatable workflows:
 
 - `feature-plan.prompt.md`
+- `product-requirements.prompt.md`
 - `revit-api-review.prompt.md`
+- `multiversion-impact.prompt.md`
 - `security-review.prompt.md`
 - `qa-validation.prompt.md`
 - `pr-summary.prompt.md`
+- `template-setup.prompt.md`
 
 Use `docs/ai/ai-tooling-setup.md` for AI tool setup and `.agents/workflows` for lifecycle, branch isolation, handoff, and validation rules.
 

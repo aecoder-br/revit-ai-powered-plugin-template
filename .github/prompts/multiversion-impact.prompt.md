@@ -1,0 +1,24 @@
+---
+name: multiversion-impact
+description: Assess Revit 2024-2027 framework, API, constants, adapter, and build impact.
+agent: agent
+argument-hint: <diff, files, feature-id, or PR>
+---
+
+# Multiversion Impact
+
+Use `AGENTS.md` as the repository rule source.
+Use `.agents/skills/revit-multiversion-architect/SKILL.md`.
+Use `.agents/workflows/validation-gates.md`.
+
+Review impact across:
+
+- Revit 2024 / `net48`;
+- Revit 2025 / `net8.0-windows`;
+- Revit 2026 / `net8.0-windows`;
+- Revit 2027 / `net10.0-windows`;
+- `REVIT2024`, `REVIT2025`, `REVIT2026`, `REVIT2027` constants;
+- adapter boundaries and conditional compilation;
+- version-specific build commands.
+
+Output a version impact matrix, risks, required validation, and pass/fail verdict.

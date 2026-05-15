@@ -1,14 +1,24 @@
 ---
-mode: agent
-description: Review AI, MCP, credential, data privacy, and logging risk.
+name: security-review
+description: Review MCP, AI Gateway, prompt injection, secrets, PII, and Revit model data leakage risk.
+agent: agent
+argument-hint: <diff, files, branch, or PR>
 ---
-
-<!-- Generated prompt adapter. Source: AGENTS.md, .agents/skills/cybersecurity-privacy-engineer/SKILL.md, .agents/workflows/validation-gates.md. -->
 
 # Security Review
 
-Use `AGENTS.md` and `.agents/skills/cybersecurity-privacy-engineer/SKILL.md`.
-Use `.agents/workflows/validation-gates.md`.
+Use `AGENTS.md` as the repository rule source.
+Use `.agents/skills/cybersecurity-privacy-engineer/SKILL.md`.
+Use `.agents/workflows/validation-gates.md` and `docs/security/mcp-security-policy.md`.
 
-Classify model data leakage, prompt injection, skill supply chain, MCP over-permission, unsafe Revit write operations, and credential exposure.
-Do not approve broad arbitrary Revit API tools, automatic destructive actions, or secret storage.
+Review for:
+
+- model data leakage;
+- prompt injection;
+- MCP over-permission;
+- unsafe Revit write operations;
+- credential exposure;
+- unsafe logging;
+- dependency or skill supply-chain risk.
+
+Output pass/fail, findings ordered by severity, and mitigation steps. Do not approve arbitrary Revit API tools or automatic destructive actions.

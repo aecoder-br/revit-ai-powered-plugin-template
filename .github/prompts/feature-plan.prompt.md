@@ -1,15 +1,23 @@
 ---
-mode: agent
-description: Plan a Revit AI template feature using the canonical agent workflows.
+name: feature-plan
+description: Plan a Revit AI template feature without implementing code.
+agent: plan
+argument-hint: <feature request or feature-id>
 ---
-
-<!-- Generated prompt adapter. Source: AGENTS.md, .agents/roster.json, .agents/skills/orchestrator-feature-lead/SKILL.md, .agents/workflows/*.md. -->
 
 # Feature Plan
 
 Use `AGENTS.md` as the repository rule source.
 Use `.agents/skills/orchestrator-feature-lead/SKILL.md`.
-Follow `.agents/workflows/feature-lifecycle.md`, `branch-isolation.md`, and `handoff-contract.md`.
+Follow `.agents/workflows/feature-lifecycle.md`, `.agents/workflows/branch-isolation.md`, and `.agents/workflows/handoff-contract.md`.
 
-Create a feature brief, identify assumptions and ambiguities, assign roles from `.agents/roster.json`, define path ownership, and list validation gates.
-Do not implement code unless the user explicitly asks for implementation.
+Work in plan mode. Do not implement code.
+
+Produce or update:
+
+- `docs/features/<feature-id>/brief.md`
+- `docs/features/<feature-id>/requirements.md`
+- `docs/features/<feature-id>/task-plan.json`
+- `docs/features/<feature-id>/handoffs/`
+
+List ambiguities, assumptions, assigned skills, path ownership, validation gates, and recommended execution order.

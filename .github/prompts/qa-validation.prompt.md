@@ -1,14 +1,23 @@
 ---
-mode: agent
-description: Plan or run validation for Revit AI template changes.
+name: qa-validation
+description: Plan or run validation and report commands, results, limitations, and version coverage.
+agent: agent
+argument-hint: <feature-id, branch, PR, or changed files>
 ---
-
-<!-- Generated prompt adapter. Source: AGENTS.md, .agents/skills/qa-automation-engineer/SKILL.md, .agents/workflows/validation-gates.md. -->
 
 # QA Validation
 
-Use `AGENTS.md` and `.agents/skills/qa-automation-engineer/SKILL.md`.
+Use `AGENTS.md` as the repository rule source.
+Use `.agents/skills/qa-automation-engineer/SKILL.md`.
 Use `.agents/workflows/validation-gates.md`.
 
-Separate unit tests, fake-based adapter tests, manual Revit smoke tests, and regression checklists.
-Run `./scripts/check.ps1` when possible and document missing SDK or missing Revit installations clearly.
+Separate:
+
+- unit tests in Core/Application;
+- fake-based adapter tests;
+- non-Revit integration-like tests;
+- manual Revit smoke tests;
+- regression checklists.
+
+Run relevant commands when possible, including `./scripts/check.ps1`.
+Create a validation report with commands executed, results, environment limitations, skipped checks, and residual risk.

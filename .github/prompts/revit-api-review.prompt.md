@@ -1,15 +1,22 @@
 ---
-mode: agent
-description: Review Revit API usage and threading boundaries.
+name: revit-api-review
+description: Review Revit API usage, threading, transactions, and architecture boundaries.
+agent: agent
+argument-hint: <diff, files, branch, or PR>
 ---
-
-<!-- Generated prompt adapter. Source: AGENTS.md, .agents/skills/revit-api-senior/SKILL.md, .agents/workflows/validation-gates.md. -->
 
 # Revit API Review
 
-Use `AGENTS.md` and `.agents/skills/revit-api-senior/SKILL.md`.
-Use `.agents/workflows/validation-gates.md` for validation expectations.
+Use `AGENTS.md` as the repository rule source.
+Use `.agents/skills/revit-api-senior/SKILL.md`.
+Use `.agents/workflows/validation-gates.md`.
 
-Review that Revit API code stays in `src/RevitAiTemplate.Revit`.
-Check ExternalEvent routing, valid API context, named transactions, DTO boundaries, selection, active document, linked documents, units, family documents, and worksharing risk.
-Report findings before any summary.
+Review for:
+
+- Revit API usage outside `src/RevitAiTemplate.Revit`;
+- missing `ExternalEvent` routing for modeless UI, WebView2, MCP, or background work;
+- unnamed or unsafe `Transaction` usage;
+- `Document`, `UIDocument`, `Element`, or mutable Revit object leakage across boundaries;
+- multi-version risk across Revit 2024, 2025, 2026, and 2027.
+
+Output pass/fail, findings ordered by severity, and required fixes. Do not hide uncertainty.
