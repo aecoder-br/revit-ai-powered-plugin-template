@@ -58,6 +58,8 @@ if (Test-Path $solution) {
   Write-Warning "Visual Studio solution not found at $solution."
 }
 
+Write-Host "Environment readiness is not checked by default. Run scripts/validate-environment.ps1 before full Revit/Public Beta validation." -ForegroundColor DarkGray
+
 $agentSkills = Join-Path $root '.agents/skills'
 $skillValidator = Join-Path $root 'scripts/validate-skills.ps1'
 if (Test-Path $agentSkills) {
