@@ -69,6 +69,8 @@ Recommended flow:
 
 See `docs/ai/index.md` for the full AI tooling guide.
 
+For Public Beta validation evidence, use `docs/validation/public-beta/README.md`.
+
 ## Choosing AI tools
 
 Choose the smallest tool set that your team will actually use:
